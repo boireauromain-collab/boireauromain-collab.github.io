@@ -9,3 +9,4 @@ lab*.ipynb
 # virtual environments
 .venv/
 myenv/
+2017.csv
