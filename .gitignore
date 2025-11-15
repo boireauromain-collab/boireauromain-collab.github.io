@@ -10,3 +10,4 @@ lab*.ipynb
 .venv/
 myenv/
 2017.csv
+airlines.csv
