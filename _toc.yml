@@ -3,3 +3,4 @@ root: index
 chapters:
   - file: lecture_16_example - Project_1
   - file: Project_2
+  - file: Project_3

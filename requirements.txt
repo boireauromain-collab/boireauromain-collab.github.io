@@ -1,6 +1,9 @@
 ipykernel
 pandas
 plotly
+geopandas
+folium
+mapclassify
 
 # needed for plotly
 nbformat
