@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vTaiwan — Digital Democracy in Taiwan</title>
+<style>
+/* ─── RESET & BASE ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --blue: #2563eb; --blue-light: #eff6ff; --blue-mid: #93c5fd;
+  --green: #16a34a; --green-light: #f0fdf4; --green-mid: #86efac;
+  --amber: #b45309; --amber-light: #fff8ed; --amber-mid: #fcd34d;
+  --purple: #7c3aed; --purple-light: #f5f3ff; --purple-mid: #c4b5fd;
+  --cyan: #0891b2; --cyan-light: #ecfeff;
+  --red: #dc2626; --red-light: #fef2f2;
+  --text: #111827; --text-sec: #6b7280; --text-light: #9ca3af;
+  --bg: #ffffff; --bg-sec: #f9fafb; --bg-ter: #f3f4f6;
+  --border: #e5e7eb; --border-dark: #d1d5db;
+  --radius: 12px; --radius-sm: 8px; --radius-lg: 16px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.05);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.10);
+}
+html { scroll-behavior: smooth; font-size: 15px; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+h1,h2,h3,h4 { line-height: 1.25; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { max-width: 100%; }
+
+/* ─── NAV ─── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,.92); backdrop-filter: blur(12px);
+  border-bottom: 1.5px solid var(--border);
+  padding: 0 24px;
+}
+.nav-inner { max-width: 1060px; margin: 0 auto; display: flex; align-items: center; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+.nav-inner::-webkit-scrollbar { display: none; }
+.nav-logo { font-weight: 800; font-size: 15px; color: var(--text); padding: 14px 12px 14px 0; white-space: nowrap; margin-right: 8px; border-right: 1.5px solid var(--border); }
+.nav-logo span { color: var(--blue); }
+.nav-link { padding: 14px 10px; font-size: 13px; font-weight: 600; color: var(--text-sec); white-space: nowrap; border-bottom: 2px solid transparent; transition: color .15s, border-color .15s; }
+.nav-link:hover { color: var(--blue); text-decoration: none; border-bottom-color: var(--blue); }
+
+/* ─── LAYOUT ─── */
+.section { padding: 64px 24px; }
+.section.alt { background: var(--bg-sec); }
+.section.dark { background: #0f172a; color: #f1f5f9; }
+.inner { max-width: 1060px; margin: 0 auto; }
+.section-label { font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.section-title { font-size: 28px; font-weight: 800; margin-bottom: 10px; }
+.section-sub { font-size: 15px; color: var(--text-sec); max-width: 640px; line-height: 1.6; margin-bottom: 36px; }
+.divider { height: 1.5px; background: var(--border); margin: 32px 0; }
+
+/* ─── HERO ─── */
+#hero { padding: 80px 24px 72px; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #0f172a 100%); color: #fff; }
+.hero-inner { max-width: 1060px; margin: 0 auto; }
+.hero-tag { display: inline-block; background: rgba(37,99,235,.35); border: 1px solid rgba(147,197,253,.4); color: #93c5fd; border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 700; letter-spacing: .5px; margin-bottom: 20px; }
+#hero h1 { font-size: 44px; font-weight: 900; line-height: 1.1; margin-bottom: 16px; }
+#hero h1 span { color: #60a5fa; }
+#hero p { font-size: 17px; color: #94a3b8; max-width: 600px; margin-bottom: 40px; line-height: 1.7; }
+.hero-stats { display: flex; gap: 32px; flex-wrap: wrap; }
+.hero-stat { }
+.hero-stat .num { font-size: 32px; font-weight: 900; color: #60a5fa; line-height: 1; }
+.hero-stat .lbl { font-size: 12px; color: #94a3b8; margin-top: 3px; }
+
+/* ─── CHIPS / BADGES ─── */
+.chip { display: inline-block; border-radius: 20px; padding: 3px 11px; font-size: 11px; font-weight: 700; }
+.chip-blue { background: var(--blue-light); color: var(--blue); }
+.chip-green { background: var(--green-light); color: var(--green); }
+.chip-amber { background: var(--amber-light); color: var(--amber); }
+.chip-purple { background: var(--purple-light); color: var(--purple); }
+.chip-gray { background: var(--bg-ter); color: var(--text-sec); }
+
+/* ─── CARDS GRID ─── */
+.cards-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.cards-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.cards-5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; }
+@media(max-width:760px) { .cards-2,.cards-3,.cards-5 { grid-template-columns: 1fr; } }
+@media(max-width:900px) { .cards-5 { grid-template-columns: 1fr 1fr; } }
+
+.card { background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.card-accent-top { border-top: 4px solid var(--blue); }
+
+/* ─── POLITICAL STRUCTURE ─── */
+.yuan-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; margin-bottom: 32px; }
+@media(max-width:900px) { .yuan-grid { grid-template-columns: 1fr 1fr; } }
+.yuan-card { background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px 14px; }
+.yuan-card .icon { font-size: 24px; margin-bottom: 8px; }
+.yuan-card h4 { font-size: 13px; font-weight: 800; margin-bottom: 4px; }
+.yuan-card p { font-size: 12px; color: var(--text-sec); line-height: 1.5; }
+.yuan-card .accent-bar { height: 3px; border-radius: 2px; margin-bottom: 12px; }
+
+.parties-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.party-card { border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.party-card h4 { font-size: 14px; font-weight: 800; margin-bottom: 6px; }
+.party-card p { font-size: 13px; color: var(--text-sec); line-height: 1.5; }
+
+/* ─── TIMELINE ─── */
+.tl-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+.tl-filter { border: 1.5px solid var(--border); border-radius: 20px; padding: 5px 14px; font-size: 12px; font-weight: 600; cursor: pointer; background: var(--bg); color: var(--text-sec); transition: all .15s; }
+.tl-filter.active { color: #fff; border-color: transparent; }
+.tl-filter[data-cat="all"].active { background: #374151; }
+.tl-filter[data-cat="colonial"].active { background: var(--purple); }
+.tl-filter[data-cat="democratic"].active { background: var(--cyan); }
+.tl-filter[data-cat="crisis"].active { background: var(--amber); }
+.tl-filter[data-cat="sunflower"].active { background: var(--green); }
+.tl-filter[data-cat="aftermath"].active { background: var(--blue); }
+
+.timeline-wrap { position: relative; padding-left: 32px; }
+.timeline-wrap::before { content:''; position:absolute; left:11px; top:8px; bottom:8px; width:2px; background:var(--border); border-radius:2px; }
+.tl-era { font-size: 10px; font-weight: 800; letter-spacing:1px; text-transform:uppercase; color:var(--text-light); margin: 20px 0 6px; }
+.tl-era:first-child { margin-top: 0; }
+.tl-event { position:relative; margin-bottom:6px; }
+.tl-event.hidden { display:none; }
+.tl-dot { position:absolute; left:-25px; top:14px; width:14px; height:14px; border-radius:50%; border:2.5px solid #fff; z-index:1; }
+.tl-card { border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:11px 14px; cursor:pointer; background:var(--bg); transition:box-shadow .15s, border-color .15s; }
+.tl-card:hover { box-shadow:var(--shadow); }
+.tl-card.open { border-color: var(--blue-mid); }
+.tl-header { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
+.tl-date { font-size:11px; font-weight:700; color:var(--text-light); min-width:90px; flex-shrink:0; }
+.tl-title { font-size:13px; font-weight:700; flex:1; }
+.tl-tag { font-size:10px; font-weight:700; border-radius:10px; padding:2px 8px; color:#fff; flex-shrink:0; }
+.tl-chevron { font-size:10px; color:var(--text-light); flex-shrink:0; margin-left:auto; transition:transform .2s; }
+.tl-card.open .tl-chevron { transform:rotate(180deg); }
+.tl-body { display:none; margin-top:8px; padding-top:8px; border-top:1px solid var(--bg-ter); font-size:13px; line-height:1.6; color:#374151; }
+.tl-card.open .tl-body { display:block; }
+.tl-pills { display:flex; gap:6px; flex-wrap:wrap; margin-top:7px; }
+.tl-pill { background:var(--bg-ter); border-radius:20px; padding:2px 10px; font-size:11px; font-weight:600; color:var(--text-sec); }
+.key-event .tl-card { border-left:3px solid; }
+.cat-sunflower .tl-dot { background:var(--green); }
+.cat-sunflower .tl-tag { background:var(--green); }
+.cat-sunflower.key-event .tl-card { border-left-color:var(--green); }
+.cat-aftermath .tl-dot { background:var(--blue); }
+.cat-aftermath .tl-tag { background:var(--blue); }
+.cat-aftermath.key-event .tl-card { border-left-color:var(--blue); }
+.cat-colonial .tl-dot { background:var(--purple); }
+.cat-colonial .tl-tag { background:var(--purple); }
+.cat-democratic .tl-dot { background:var(--cyan); }
+.cat-democratic .tl-tag { background:var(--cyan); }
+.cat-crisis .tl-dot { background:var(--amber); }
+.cat-crisis .tl-tag { background:var(--amber); }
+.cat-crisis.key-event .tl-card { border-left-color:var(--amber); }
+.cat-democratic.key-event .tl-card { border-left-color:var(--cyan); }
+
+/* ─── FOUNDERS ─── */
+.founders-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media(max-width:620px) { .founders-grid { grid-template-columns:1fr; } }
+.founder-card { border:1.5px solid var(--border); border-radius:var(--radius); padding:18px; background:var(--bg); cursor:pointer; transition:box-shadow .15s, border-color .15s; position:relative; overflow:hidden; }
+.founder-card:hover { box-shadow:var(--shadow); }
+.founder-card.open { border-color:var(--blue-mid); }
+.founder-accent { height:4px; border-radius:var(--radius) var(--radius) 0 0; position:absolute; top:0; left:0; right:0; }
+.founder-avatar-row { display:flex; align-items:center; gap:14px; margin:8px 0 14px; }
+.founder-avatar { width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:26px; flex-shrink:0; border:2px solid var(--border); }
+.founder-name { font-size:15px; font-weight:800; line-height:1.2; }
+.founder-zh { font-size:12px; color:var(--text-sec); margin-top:2px; }
+.founder-role { display:inline-block; font-size:11px; font-weight:700; border-radius:20px; padding:3px 9px; margin-top:5px; color:#fff; }
+.founder-desc { font-size:13px; line-height:1.6; color:#374151; }
+.founder-extra { display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--bg-ter); }
+.founder-card.open .founder-extra { display:block; }
+.mini-tl { display:flex; flex-direction:column; gap:5px; margin-top:8px; }
+.mini-tl-row { display:flex; gap:10px; align-items:baseline; font-size:12px; }
+.mini-tl-year { font-weight:700; color:var(--text-light); min-width:42px; flex-shrink:0; }
+.mini-tl-text { color:#444; line-height:1.4; }
+.quote-box { background:var(--blue-light); border-left:3px solid var(--blue); border-radius:0 8px 8px 0; padding:8px 12px; font-size:12px; font-style:italic; color:#374151; margin-top:10px; line-height:1.5; }
+.expand-hint { font-size:11px; color:var(--text-light); margin-top:10px; }
+.founder-card.open .expand-hint { display:none; }
+
+/* ─── ECOSYSTEM ─── */
+.origin-flow { display:flex; align-items:center; gap:0; flex-wrap:wrap; margin-bottom:24px; }
+.origin-node { background:var(--bg); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; font-size:12px; text-align:center; flex:1; min-width:110px; }
+.origin-node .o-icon { font-size:22px; margin-bottom:5px; }
+.origin-node .o-title { font-weight:700; font-size:12px; }
+.origin-node .o-date { font-size:10px; color:var(--text-light); margin-top:2px; }
+.origin-arrow { font-size:18px; color:var(--text-light); padding:0 6px; flex-shrink:0; }
+
+.platform-compare { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+@media(max-width:620px) { .platform-compare { grid-template-columns:1fr; } }
+.plat-card { border:1.5px solid var(--border); border-radius:var(--radius); padding:16px; background:var(--bg); }
+.plat-head { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.plat-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.plat-head h4 { font-size:14px; font-weight:800; }
+.plat-head .plat-sub { font-size:11px; color:var(--text-sec); }
+.plat-row { display:flex; gap:8px; margin-bottom:5px; font-size:12px; }
+.plat-lbl { font-weight:700; color:var(--text-sec); min-width:72px; flex-shrink:0; }
+.plat-val { color:#374151; line-height:1.4; }
+.status-chip { display:inline-block; border-radius:20px; padding:2px 9px; font-size:10px; font-weight:700; margin-top:8px; }
+.chip-active { background:#dcfce7; color:#166534; }
+.chip-dormant { background:#fef9c3; color:#854d0e; }
+
+.constraint-box { background:#fff8f0; border:1.5px solid #fed7aa; border-radius:var(--radius); padding:16px; }
+.constraint-box h4 { font-size:13px; font-weight:700; color:#9a3412; margin-bottom:10px; }
+.constraint-item { font-size:12.5px; color:#7c2d12; line-height:1.6; padding:5px 0; border-bottom:1px solid #fed7aa; display:flex; gap:8px; }
+.constraint-item:last-child { border-bottom:none; }
+.constraint-item::before { content:"▸"; flex-shrink:0; margin-top:1px; }
+
+/* ─── PROCESS ─── */
+.process-nav { display:flex; gap:0; border-radius:var(--radius); overflow:hidden; border:1.5px solid var(--border); margin-bottom:24px; }
+.process-btn { flex:1; padding:11px 6px; text-align:center; cursor:pointer; font-size:12px; font-weight:600; background:var(--bg-sec); color:var(--text-sec); border:none; transition:all .2s; border-right:1.5px solid var(--border); line-height:1.3; }
+.process-btn:last-child { border-right:none; }
+.process-btn .p-num { display:block; font-size:10px; font-weight:700; opacity:.7; margin-bottom:2px; }
+.process-btn.active { background:var(--blue); color:#fff; }
+.process-panel { display:none; }
+.process-panel.active { display:block; }
+.process-header { display:flex; align-items:flex-start; gap:16px; margin-bottom:16px; }
+.process-icon { width:46px; height:46px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+.process-header h3 { font-size:16px; font-weight:800; margin-bottom:4px; }
+.process-header p { font-size:13px; color:var(--text-sec); line-height:1.6; }
+.tools-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+.tool-badge { background:var(--bg-ter); border:1.5px solid var(--border); border-radius:20px; padding:4px 13px; font-size:12px; font-weight:600; color:var(--text); }
+.demo-box { border:1.5px solid var(--border); border-radius:var(--radius); padding:18px; background:var(--bg); }
+.demo-box h4 { font-size:12px; font-weight:700; color:var(--text-sec); text-transform:uppercase; letter-spacing:.5px; margin-bottom:14px; }
+
+/* issue form */
+.issue-form { display:flex; flex-direction:column; gap:10px; }
+.issue-form label { font-size:12px; font-weight:600; color:var(--text-sec); }
+.issue-form input, .issue-form textarea, .issue-form select { width:100%; border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:8px 10px; font-size:13px; background:var(--bg); color:var(--text); font-family:inherit; resize:vertical; }
+.issue-form textarea { min-height:70px; }
+.btn-primary { background:var(--blue); color:#fff; border:none; border-radius:var(--radius-sm); padding:9px 18px; font-size:13px; font-weight:600; cursor:pointer; align-self:flex-start; transition:background .15s; }
+.btn-primary:hover { background:#1d4ed8; }
+.success-box { background:#ecfdf5; border:1.5px solid #6ee7b7; border-radius:var(--radius-sm); padding:11px 14px; font-size:13px; color:#065f46; display:none; }
+
+/* pol.is demo */
+.statement-card { border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; margin-bottom:10px; background:var(--bg); }
+.statement-text { font-size:13px; line-height:1.5; margin-bottom:10px; }
+.vote-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.vote-btn { border:1.5px solid; border-radius:20px; padding:5px 14px; font-size:12px; font-weight:600; cursor:pointer; transition:all .15s; background:transparent; }
+.vote-agree { border-color:var(--green); color:var(--green); }
+.vote-agree:hover, .vote-agree.sel { background:var(--green); color:#fff; }
+.vote-disagree { border-color:var(--red); color:var(--red); }
+.vote-disagree:hover, .vote-disagree.sel { background:var(--red); color:#fff; }
+.vote-pass { border-color:#94a3b8; color:#64748b; }
+.vote-pass:hover, .vote-pass.sel { background:#94a3b8; color:#fff; }
+.vote-count { font-size:11px; color:var(--text-light); margin-left:auto; }
+.consensus-section { margin-top:14px; padding-top:12px; border-top:1.5px solid var(--bg-ter); display:none; }
+.consensus-row { display:flex; gap:6px; align-items:center; margin-bottom:8px; font-size:12px; }
+.c-label { width:80px; text-align:right; font-weight:600; color:var(--text-sec); flex-shrink:0; }
+.c-track { flex:1; height:18px; background:var(--bg-ter); border-radius:4px; overflow:hidden; }
+.c-fill { height:100%; border-radius:4px; background:var(--green); transition:width .6s ease; display:flex; align-items:center; padding-left:6px; font-size:11px; color:#fff; font-weight:700; }
+.consensus-note { font-size:12px; color:var(--blue); font-weight:600; margin-top:8px; }
+
+/* debate */
+.debate-feed { max-height:200px; overflow-y:auto; margin-bottom:10px; display:flex; flex-direction:column; gap:8px; }
+.d-msg { border-radius:var(--radius-sm); padding:8px 12px; font-size:13px; line-height:1.5; }
+.d-msg.citizen { background:var(--blue-light); border-left:3px solid var(--blue); }
+.d-msg.official { background:var(--amber-light); border-left:3px solid #f59e0b; }
+.d-msg .d-author { font-weight:700; font-size:11px; margin-bottom:3px; }
+.debate-input { display:flex; gap:8px; }
+.debate-input input { flex:1; border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:7px 10px; font-size:13px; font-family:inherit; background:var(--bg); color:var(--text); }
+.debate-input button { background:var(--blue); color:#fff; border:none; border-radius:var(--radius-sm); padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
+
+/* legislation timeline */
+.leg-tl { display:flex; flex-direction:column; gap:0; }
+.leg-step { display:flex; gap:12px; padding-bottom:14px; position:relative; }
+.leg-step:not(:last-child)::before { content:''; position:absolute; left:15px; top:32px; bottom:0; width:2px; background:var(--border); }
+.leg-dot { width:30px; height:30px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; z-index:1; }
+.leg-dot.done { background:var(--green); color:#fff; }
+.leg-dot.act { background:var(--blue); color:#fff; }
+.leg-dot.pend { background:var(--bg-ter); color:var(--text-light); border:1.5px solid var(--border); }
+.leg-content h4 { font-size:13px; font-weight:700; margin-bottom:2px; }
+.leg-content p { font-size:12px; color:var(--text-sec); line-height:1.4; }
+
+/* ─── CASES ─── */
+.case-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
+.case-tab { border:1.5px solid var(--border); border-radius:20px; padding:5px 13px; font-size:12px; font-weight:600; cursor:pointer; background:var(--bg); color:var(--text-sec); transition:all .15s; }
+.case-tab.active { background:var(--blue); color:#fff; border-color:var(--blue); }
+.case-panel { display:none; }
+.case-panel.active { display:block; }
+.outcome-chip { display:inline-block; border-radius:20px; padding:3px 12px; font-size:11px; font-weight:700; margin-bottom:10px; }
+.outcome-pass { background:#dcfce7; color:#166534; }
+.outcome-ongoing { background:#dbeafe; color:#1e40af; }
+.case-stats { display:flex; gap:28px; flex-wrap:wrap; margin-bottom:14px; }
+.case-stat .num { font-size:26px; font-weight:900; color:var(--blue); line-height:1; }
+.case-stat .lbl { font-size:11px; color:var(--text-sec); margin-top:2px; }
+.case-text { font-size:13px; line-height:1.7; color:#374151; }
+
+/* ─── LIMITATIONS ─── */
+.limitation-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+@media(max-width:640px) { .limitation-grid { grid-template-columns:1fr; } }
+.limitation-card { border:1.5px solid var(--border); border-radius:var(--radius); padding:16px; background:var(--bg); }
+.limitation-card .l-icon { font-size:22px; margin-bottom:8px; }
+.limitation-card h4 { font-size:13px; font-weight:700; margin-bottom:6px; }
+.limitation-card p { font-size:13px; color:var(--text-sec); line-height:1.6; }
+
+/* ─── FOOTER ─── */
+footer { background:#0f172a; color:#94a3b8; padding:48px 24px; font-size:13px; }
+.footer-inner { max-width:1060px; margin:0 auto; }
+footer h3 { color:#f1f5f9; font-size:15px; margin-bottom:16px; }
+.sources-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px 24px; }
+@media(max-width:620px) { .sources-grid { grid-template-columns:1fr; } }
+footer a { color:#60a5fa; }
+footer a:hover { color:#93c5fd; }
+.footer-note { margin-top:28px; padding-top:20px; border-top:1px solid #1e293b; color:#475569; font-size:12px; }
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">v<span>Taiwan</span></div>
+    <a class="nav-link" href="#context">Context</a>
+    <a class="nav-link" href="#g0v">g0v</a>
+    <a class="nav-link" href="#timeline">Timeline</a>
+    <a class="nav-link" href="#founders">Founders</a>
+    <a class="nav-link" href="#ecosystem">Ecosystem</a>
+    <a class="nav-link" href="#process">Process</a>
+    <a class="nav-link" href="#cases">Cases</a>
+    <a class="nav-link" href="#limitations">Limitations</a>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Digital Democracy · Taiwan · 2014–present</div>
+    <h1>How Taiwan <span>crowdsources</span> its laws</h1>
+    <p>vTaiwan is an open consultation platform combining civic technology with lawmaking — born from a protest movement and built by hackers, lawyers, and citizens to break legislative deadlocks through structured online deliberation.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">26</div><div class="lbl">National issues deliberated</div></div>
+      <div class="hero-stat"><div class="num">80%</div><div class="lbl">Led to decisive government action</div></div>
+      <div class="hero-stat"><div class="num">500K+</div><div class="lbl">Protesters → Sunflower Movement</div></div>
+      <div class="hero-stat"><div class="num">2014</div><div class="lbl">Year vTaiwan was born</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ POLITICAL CONTEXT ═══ -->
+<section id="context" class="section alt">
+  <div class="inner">
+    <div class="section-label">Background</div>
+    <h2 class="section-title">Political & Administrative Structure</h2>
+    <p class="section-sub">Taiwan's central government is divided into five branches — the "Five Yuan" — each with distinct powers. Understanding this structure is essential to grasping how vTaiwan interfaces with formal lawmaking.</p>
+
+    <div class="yuan-grid">
+      <div class="yuan-card">
+        <div class="accent-bar" style="background:#2563eb;"></div>
+        <div class="icon">🏛</div>
+        <h4>Executive Yuan</h4>
+        <p>Formulates and implements national policies. The Cabinet. Where vTaiwan's outputs go first.</p>
+      </div>
+      <div class="yuan-card">
+        <div class="accent-bar" style="background:#16a34a;"></div>
+        <div class="icon">📜</div>
+        <h4>Legislative Yuan</h4>
+        <p>Reviews and enacts legislation, conducts policy hearings, examines budgets and government operations.</p>
+      </div>
+      <div class="yuan-card">
+        <div class="accent-bar" style="background:#7c3aed;"></div>
+        <div class="icon">⚖️</div>
+        <h4>Judicial Yuan</h4>
+        <p>The highest judicial organ, handling civil, criminal, and administrative cases.</p>
+      </div>
+      <div class="yuan-card">
+        <div class="accent-bar" style="background:#0891b2;"></div>
+        <div class="icon">📋</div>
+        <h4>Examination Yuan</h4>
+        <p>Manages the civil service system — examinations, recruitment, and public servant affairs.</p>
+      </div>
+      <div class="yuan-card">
+        <div class="accent-bar" style="background:#b45309;"></div>
+        <div class="icon">🔍</div>
+        <h4>Control Yuan</h4>
+        <p>Impeaches and censures officials; audits government agencies. A watchdog branch.</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <h3 style="font-size:16px; font-weight:700; margin-bottom:14px;">The Two Major Parties</h3>
+    <div class="parties-row">
+      <div class="party-card" style="border-top:3px solid #1d4ed8;">
+        <h4 style="color:#1d4ed8;">🔵 Kuomintang (KMT)</h4>
+        <p>Chinese Nationalist Party. Pro-closer economic integration with mainland China. Ruled Taiwan under martial law 1949–1987. More favorable to cross-strait trade agreements like the CSSTA.</p>
+      </div>
+      <div class="party-card" style="border-top:3px solid #16a34a;">
+        <h4 style="color:#16a34a;">🟢 Democratic Progressive Party (DPP)</h4>
+        <p>Founded as an opposition to the KMT. Promotes distinct Taiwanese identity and sovereignty. More skeptical of Beijing's economic influence. Tsai Ing-wen (DPP) invited Audrey Tang to government.</p>
+      </div>
+    </div>
+    <p style="font-size:13px; color:var(--text-sec); margin-top:12px;">Taiwan now has additional parties beyond these two, representing perspectives that don't fit neatly into the KMT–DPP binary — particularly on generational, environmental, and identity issues.</p>
+  </div>
+</section>
+
+<!-- ═══ G0V ═══ -->
+<section id="g0v" class="section">
+  <div class="inner">
+    <div class="section-label">Origin</div>
+    <h2 class="section-title">g0v — "Gov Zero"</h2>
+    <p class="section-sub">Before vTaiwan, there was g0v — a leaderless civic tech collective that proved the government's tools could be rebuilt better by citizens. vTaiwan is g0v's most lasting political legacy.</p>
+
+    <div class="cards-3">
+      <div class="card" style="border-top:3px solid var(--cyan);">
+        <div style="font-size:22px; margin-bottom:10px;">💡</div>
+        <h4 style="font-size:14px; font-weight:700; margin-bottom:6px;">The Spark — October 2012</h4>
+        <p style="font-size:13px; color:var(--text-sec); line-height:1.6;">Chia-liang Kao ("clkao") saw a 40-second government budget ad and started analyzing public spending data himself. He asked: why can't citizens see where their taxes go? That question became g0v.</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--green);">
+        <div style="font-size:22px; margin-bottom:10px;">🛠</div>
+        <h4 style="font-size:14px; font-weight:700; margin-bottom:6px;">Fork the Government</h4>
+        <p style="font-size:13px; color:var(--text-sec); line-height:1.6;">g0v's philosophy: don't petition the government to improve — build a better version yourself and make it open source. Their motto: <em>"Don't ask why nobody is doing this. You are nobody."</em></p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--blue);">
+        <div style="font-size:22px; margin-bottom:10px;">🌻</div>
+        <h4 style="font-size:14px; font-weight:700; margin-bottom:6px;">Sunflower Moment — 2014</h4>
+        <p style="font-size:13px; color:var(--text-sec); line-height:1.6;">g0v members supported the Sunflower Movement with livestreaming tools, websites, and real-time coordination platforms. This visibility brought g0v to national attention and earned government trust.</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div style="background:var(--bg-sec); border:1.5px solid var(--border); border-radius:var(--radius); padding:20px; display:flex; gap:20px; align-items:flex-start;">
+      <div style="font-size:32px;">🔄</div>
+      <div>
+        <h4 style="font-size:14px; font-weight:700; margin-bottom:6px;">From Hackathon to Law</h4>
+        <p style="font-size:13px; color:var(--text-sec); line-height:1.6;">In December 2014, Minister without Portfolio Jaclyn Tsai attended a g0v hackathon and pitched a collaboration: build a participatory policy platform together. The g0v community accepted. The result — vTaiwan — launched in early 2015. It was the first time a civic hacker collective had been formally commissioned to build a government consultation tool.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TIMELINE ═══ -->
+<section id="timeline" class="section alt">
+  <div class="inner">
+    <div class="section-label">History</div>
+    <h2 class="section-title">From Colony to Digital Democracy</h2>
+    <p class="section-sub">Taiwan's path to participatory digital lawmaking spans centuries of colonial rule, decades of martial law, and a pivotal student uprising. Click any event to expand. Filter by category.</p>
+
+    <div class="tl-filters" id="tl-filters">
+      <button class="tl-filter active" data-cat="all" onclick="filterTl('all',this)">All</button>
+      <button class="tl-filter" data-cat="colonial" onclick="filterTl('colonial',this)">🏯 Colonial & Empire</button>
+      <button class="tl-filter" data-cat="democratic" onclick="filterTl('democratic',this)">🗳 Democratic Reform</button>
+      <button class="tl-filter" data-cat="crisis" onclick="filterTl('crisis',this)">⚡ Crisis & Tension</button>
+      <button class="tl-filter" data-cat="sunflower" onclick="filterTl('sunflower',this)">🌻 Sunflower Movement</button>
+      <button class="tl-filter" data-cat="aftermath" onclick="filterTl('aftermath',this)">🌐 Aftermath & vTaiwan</button>
+    </div>
+    <div class="timeline-wrap" id="tl-container"></div>
+  </div>
+</section>
+
+<!-- ═══ FOUNDERS ═══ -->
+<section id="founders" class="section">
+  <div class="inner">
+    <div class="section-label">Key People</div>
+    <h2 class="section-title">The Founders</h2>
+    <p class="section-sub">vTaiwan was built at the intersection of civic hacking, legal expertise, and political will. Click a card to see the full profile.</p>
+    <div class="founders-grid">
+
+      <div class="founder-card" onclick="toggleFounder(this)">
+        <div class="founder-accent" style="background:linear-gradient(90deg,#0891b2,#06b6d4);"></div>
+        <div class="founder-avatar-row">
+          <div class="founder-avatar" style="background:var(--cyan-light);">💻</div>
+          <div>
+            <div class="founder-name">Chia-liang Kao</div>
+            <div class="founder-zh">高嘉良 · "clkao"</div>
+            <span class="founder-role" style="background:#0891b2;">g0v Co-founder</span>
+          </div>
+        </div>
+        <div class="founder-desc">Open-source developer who co-founded g0v in 2012 after a government budget ad sparked his curiosity. Built the civic tech movement that ultimately gave birth to vTaiwan.</div>
+        <div class="founder-extra">
+          <div class="mini-tl">
+            <div class="mini-tl-row"><span class="mini-tl-year">2000</span><span class="mini-tl-text">Active open-source developer; created SVK, a distributed version-control system</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">Oct 2012</span><span class="mini-tl-text">Saw a government budget ad — began analyzing public spending data, spark for g0v</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">Nov 2012</span><span class="mini-tl-text">Co-founded g0v with ipa, kirby and others at the first bimonthly hackathon in Taipei</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">2014</span><span class="mini-tl-text">g0v members provided tech support (livestreaming, websites) during Sunflower Movement</span></div>
+          </div>
+          <div class="quote-box">"We replace the 'o' in gov with '0' — to signal that we start from zero and rebuild transparency from the ground up."</div>
+        </div>
+        <div class="expand-hint">Click to expand full profile ↓</div>
+      </div>
+
+      <div class="founder-card" onclick="toggleFounder(this)">
+        <div class="founder-accent" style="background:linear-gradient(90deg,#7c3aed,#a78bfa);"></div>
+        <div class="founder-avatar-row">
+          <div class="founder-avatar" style="background:var(--purple-light);">⚖️</div>
+          <div>
+            <div class="founder-name">Jaclyn Tsai</div>
+            <div class="founder-zh">蔡玉玲</div>
+            <span class="founder-role" style="background:#7c3aed;">Government Catalyst</span>
+          </div>
+        </div>
+        <div class="founder-desc">Minister without Portfolio who bridged government and g0v. In December 2014 she commissioned the g0v team to build vTaiwan — the first government-initiated, civic-tech-built policy platform.</div>
+        <div class="founder-extra">
+          <div class="mini-tl">
+            <div class="mini-tl-row"><span class="mini-tl-year">1977</span><span class="mini-tl-text">Law degree, National Taiwan University</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">1982–91</span><span class="mini-tl-text">District court judge</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">1996–98</span><span class="mini-tl-text">General Counsel, IBM Greater China Group</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">1998</span><span class="mini-tl-text">Co-founded Lee, Tsai & Partners law firm</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">Nov 2013</span><span class="mini-tl-text">Appointed Minister without Portfolio, Executive Yuan</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">Dec 2014</span><span class="mini-tl-text">Pitched vTaiwan at a g0v hackathon; commissioned the platform</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">May 2016</span><span class="mini-tl-text">Left ministerial role when DPP came to power</span></div>
+          </div>
+          <div class="quote-box">Tsai's insight: rather than build participation tools inside government, she asked the civic hackers who already had them — merging institutional legitimacy with grassroots expertise.</div>
+        </div>
+        <div class="expand-hint">Click to expand full profile ↓</div>
+      </div>
+
+      <div class="founder-card" onclick="toggleFounder(this)">
+        <div class="founder-accent" style="background:linear-gradient(90deg,#2563eb,#60a5fa);"></div>
+        <div class="founder-avatar-row">
+          <div class="founder-avatar" style="background:var(--blue-light);">🌐</div>
+          <div>
+            <div class="founder-name">Audrey Tang</div>
+            <div class="founder-zh">唐鳳</div>
+            <span class="founder-role" style="background:#2563eb;">Digital Minister</span>
+          </div>
+        </div>
+        <div class="founder-desc">Former hacker, g0v core member, Sunflower supporter. Taiwan's youngest-ever minister and the world's first transgender government minister. Scaled vTaiwan's ethos into national policy.</div>
+        <div class="founder-extra">
+          <div class="mini-tl">
+            <div class="mini-tl-row"><span class="mini-tl-year">1981</span><span class="mini-tl-text">Born in Taipei</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">1993</span><span class="mini-tl-text">Self-taught coder at 12; left school to learn independently</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">1996</span><span class="mini-tl-text">Founded IT startup at age 15</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">~2012</span><span class="mini-tl-text">Core member of g0v; contributed to open government tools</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">2014</span><span class="mini-tl-text">Livestreamed Sunflower Movement; helped protesters broadcast their message</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">Aug 2016</span><span class="mini-tl-text">Appointed Minister without Portfolio — youngest in Taiwan's history (35); first transgender cabinet member globally</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">Aug 2022</span><span class="mini-tl-text">Became Taiwan's first Minister of Digital Affairs</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">May 2024</span><span class="mini-tl-text">Left ministry after government reshuffle</span></div>
+          </div>
+          <div class="quote-box">"Transparency is the best form of accountability. When people can see what I'm doing, I have to think harder about whether it's right."</div>
+        </div>
+        <div class="expand-hint">Click to expand full profile ↓</div>
+      </div>
+
+      <div class="founder-card" onclick="toggleFounder(this)">
+        <div class="founder-accent" style="background:linear-gradient(90deg,#16a34a,#4ade80);"></div>
+        <div class="founder-avatar-row">
+          <div class="founder-avatar" style="background:var(--green-light);">🛠</div>
+          <div>
+            <div class="founder-name">g0v Community</div>
+            <div class="founder-zh">零時政府</div>
+            <span class="founder-role" style="background:#16a34a;">Civic Tech Collective</span>
+          </div>
+        </div>
+        <div class="founder-desc">A leaderless, open-source civic tech collective. Built Taiwan's digital democracy infrastructure — including vTaiwan itself. Operates on a "fork the government" philosophy: build the better version.</div>
+        <div class="founder-extra">
+          <div class="mini-tl">
+            <div class="mini-tl-row"><span class="mini-tl-year">Nov 2012</span><span class="mini-tl-text">First hackathon sparked by government budget visualization project</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">2012–14</span><span class="mini-tl-text">Built open budget tools, government data dashboards, real-time disaster maps</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">2014</span><span class="mini-tl-text">Tech support during Sunflower occupation — livestreaming, coordination tools</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">2014–15</span><span class="mini-tl-text">Built vTaiwan at government request (Jaclyn Tsai commission)</span></div>
+            <div class="mini-tl-row"><span class="mini-tl-year">2023+</span><span class="mini-tl-text">Relaunched vTaiwan as volunteer-driven civic lab; integrating AI tools (Claude, ChatGPT)</span></div>
+          </div>
+          <div class="quote-box">"Don't ask why nobody is doing this — you are nobody." — g0v community motto</div>
+        </div>
+        <div class="expand-hint">Click to expand full profile ↓</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ECOSYSTEM ═══ -->
+<section id="ecosystem" class="section alt">
+  <div class="inner">
+    <div class="section-label">Platform Landscape</div>
+    <h2 class="section-title">The Ecosystem</h2>
+    <p class="section-sub">How vTaiwan was born — and how it relates to Taiwan's other civic participation infrastructure.</p>
+
+    <h3 style="font-size:14px; font-weight:700; margin-bottom:14px; color:var(--text-sec); text-transform:uppercase; letter-spacing:.5px; font-size:11px;">Origin chain</h3>
+    <div class="origin-flow" style="margin-bottom:28px;">
+      <div class="origin-node"><div class="o-icon">🛠</div><div class="o-title">g0v founded</div><div class="o-date">Nov 2012</div></div>
+      <div class="origin-arrow">→</div>
+      <div class="origin-node"><div class="o-icon">🌻</div><div class="o-title">Sunflower Movement</div><div class="o-date">Mar 2014</div></div>
+      <div class="origin-arrow">→</div>
+      <div class="origin-node"><div class="o-icon">🤝</div><div class="o-title">Govt + g0v meet</div><div class="o-date">Dec 2014</div></div>
+      <div class="origin-arrow">→</div>
+      <div class="origin-node"><div class="o-icon">🗳</div><div class="o-title">vTaiwan launched</div><div class="o-date">Early 2015</div></div>
+      <div class="origin-arrow">→</div>
+      <div class="origin-node"><div class="o-icon">🧪</div><div class="o-title">First test case</div><div class="o-date">2015</div></div>
+    </div>
+
+    <div class="divider"></div>
+    <h3 style="font-size:15px; font-weight:700; margin-bottom:14px;">Two platforms, overlapping roles</h3>
+    <div class="platform-compare">
+      <div class="plat-card">
+        <div class="plat-head">
+          <div class="plat-icon" style="background:var(--blue-light);">🗳</div>
+          <div><h4>vTaiwan</h4><div class="plat-sub">vtaiwan.tw · since 2015</div></div>
+        </div>
+        <div class="plat-row"><span class="plat-lbl">Creator</span><span class="plat-val">g0v community (commissioned by Jaclyn Tsai)</span></div>
+        <div class="plat-row"><span class="plat-lbl">Scope</span><span class="plat-val">Digital economy & tech regulation only</span></div>
+        <div class="plat-row"><span class="plat-lbl">Initiation</span><span class="plat-val">Government releases issue first — citizens respond</span></div>
+        <div class="plat-row"><span class="plat-lbl">Key tool</span><span class="plat-val">Pol.is consensus mapping</span></div>
+        <div class="plat-row"><span class="plat-lbl">Binding?</span><span class="plat-val">No — advisory only</span></div>
+        <span class="status-chip chip-dormant">⚠ Volunteer-run since 2023</span>
+      </div>
+      <div class="plat-card">
+        <div class="plat-head">
+          <div class="plat-icon" style="background:var(--green-light);">📋</div>
+          <div><h4>Public Policy Platform</h4><div class="plat-sub">join.gov.tw · since 2015</div></div>
+        </div>
+        <div class="plat-row"><span class="plat-lbl">Creator</span><span class="plat-val">National Development Council (NDC)</span></div>
+        <div class="plat-row"><span class="plat-lbl">Scope</span><span class="plat-val">All public policy domains</span></div>
+        <div class="plat-row"><span class="plat-lbl">Initiation</span><span class="plat-val">Citizens can directly propose issues (bottom-up)</span></div>
+        <div class="plat-row"><span class="plat-lbl">Functions</span><span class="plat-val">Talk · Supervise · Propose · Contact</span></div>
+        <div class="plat-row"><span class="plat-lbl">Binding?</span><span class="plat-val">No — but government must respond</span></div>
+        <span class="status-chip chip-active">✅ Primary official channel (active)</span>
+      </div>
+    </div>
+
+    <div style="background:#fff7ed; border:1.5px solid #fed7aa; border-radius:var(--radius-sm); padding:12px 16px; font-size:13px; color:#7c2d12; margin-bottom:20px;">
+      <strong>Why the overlap became a problem:</strong> Both platforms launched in 2015, causing confusion. Over time the government prioritized join.gov.tw because citizens can propose issues directly (bottom-up), whereas vTaiwan requires a government agency to release an issue first. Resources gradually merged toward Join.
+    </div>
+
+    <div class="constraint-box">
+      <h4>⚠ vTaiwan's structural paradox</h4>
+      <div class="constraint-item">Born from a bottom-up movement (Sunflower), but operates on a top-down trigger: a government agency must release an issue before citizens can engage.</div>
+      <div class="constraint-item">Citizens cannot independently initiate a vTaiwan process — making participation reactive, not proactive.</div>
+      <div class="constraint-item">Government has no legal obligation to adopt vTaiwan's recommendations — political will remains the key variable.</div>
+      <div class="constraint-item">Scope formally limited to digital/technology issues, preventing expansion to broader social or economic policy.</div>
+      <div class="constraint-item">join.gov.tw solved the initiation problem (citizen-led proposals) — which is why it gradually superseded vTaiwan as the primary channel.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PROCESS ═══ -->
+<style>
+.mode-tabs { display:flex; gap:0; border:1.5px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:28px; }
+.mode-tab { flex:1; padding:13px 16px; font-size:14px; font-weight:700; cursor:pointer; border:none; background:var(--bg-sec); color:var(--text-sec); transition:all .2s; border-right:1.5px solid var(--border); }
+.mode-tab:last-child { border-right:none; }
+.mode-tab.active { background:var(--blue); color:#fff; }
+.mode-tab .mode-sub { display:block; font-size:11px; font-weight:500; opacity:.8; margin-top:2px; }
+
+/* Stepper */
+.step-indicator { display:flex; align-items:center; margin-bottom:28px; }
+.step-node { display:flex; flex-direction:column; align-items:center; gap:5px; flex:1; }
+.step-circle { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; border:2px solid var(--border); background:var(--bg); color:var(--text-light); transition:all .3s; }
+.step-circle.done { background:var(--green); border-color:var(--green); color:#fff; }
+.step-circle.active { background:var(--blue); border-color:var(--blue); color:#fff; box-shadow:0 0 0 4px rgba(37,99,235,.15); }
+.step-label { font-size:10px; font-weight:700; color:var(--text-light); text-align:center; text-transform:uppercase; letter-spacing:.4px; line-height:1.2; }
+.step-label.active { color:var(--blue); }
+.step-label.done { color:var(--green); }
+.step-connector { height:2px; background:var(--border); flex:1; margin:0 -2px; position:relative; top:-14px; transition:background .3s; }
+.step-connector.done { background:var(--green); }
+
+/* Step panels */
+.wt-panel { display:none; }
+.wt-panel.active { display:block; }
+.wt-stage-header { display:flex; align-items:center; gap:12px; background:var(--bg-sec); border:1.5px solid var(--border); border-radius:var(--radius); padding:14px 16px; margin-bottom:18px; }
+.wt-stage-num { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.wt-stage-header h3 { font-size:15px; font-weight:800; margin-bottom:2px; }
+.wt-stage-header p { font-size:12px; color:var(--text-sec); line-height:1.4; }
+
+/* Stakeholder map */
+.stakeholder-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:16px; }
+.stakeholder-card { border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:12px; text-align:center; background:var(--bg); }
+.stakeholder-card .s-icon { font-size:22px; margin-bottom:6px; }
+.stakeholder-card h4 { font-size:12px; font-weight:700; margin-bottom:4px; }
+.stakeholder-card p { font-size:11px; color:var(--text-sec); line-height:1.4; }
+.stakeholder-card.conflict { border-color:#fca5a5; background:#fef2f2; }
+.stakeholder-card.neutral { border-color:#fcd34d; background:#fffbeb; }
+
+/* Opinion clusters */
+.cluster-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+.cluster-card { border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:12px; }
+.cluster-card h4 { font-size:12px; font-weight:700; margin-bottom:8px; }
+.cluster-item { font-size:12px; color:var(--text-sec); padding:3px 0; display:flex; gap:6px; line-height:1.4; }
+.cluster-item::before { content:"•"; flex-shrink:0; }
+
+/* Consensus reveal */
+.consensus-reveal { background:var(--green-light); border:1.5px solid var(--green-mid); border-radius:var(--radius-sm); padding:14px; margin-top:14px; }
+.consensus-reveal h4 { font-size:12px; font-weight:700; color:var(--green); margin-bottom:8px; }
+.consensus-tag { display:inline-block; background:#dcfce7; color:#166534; border-radius:20px; padding:3px 10px; font-size:11px; font-weight:600; margin:2px; }
+
+/* Debate replay */
+.debate-replay { display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+.dr-msg { border-radius:var(--radius-sm); padding:9px 12px; font-size:13px; line-height:1.5; opacity:0; transform:translateY(6px); transition:opacity .4s, transform .4s; }
+.dr-msg.shown { opacity:1; transform:translateY(0); }
+.dr-msg.taxi { background:#fef2f2; border-left:3px solid #ef4444; }
+.dr-msg.uber { background:#eff6ff; border-left:3px solid var(--blue); }
+.dr-msg.govt { background:#fffbeb; border-left:3px solid #f59e0b; }
+.dr-msg.consensus { background:var(--green-light); border-left:3px solid var(--green); }
+.dr-author { font-size:10px; font-weight:700; margin-bottom:3px; text-transform:uppercase; letter-spacing:.4px; }
+
+/* 7 conditions */
+.conditions-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; }
+@media(max-width:560px) { .conditions-grid { grid-template-columns:1fr; } }
+.condition-item { display:flex; gap:8px; align-items:flex-start; background:var(--bg-sec); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:10px 12px; font-size:12px; line-height:1.4; }
+.condition-item .c-num { width:20px; height:20px; border-radius:50%; background:var(--blue); color:#fff; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+
+/* Nav buttons */
+.step-nav { display:flex; justify-content:space-between; align-items:center; margin-top:20px; }
+.btn-nav { border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:9px 18px; font-size:13px; font-weight:600; cursor:pointer; background:var(--bg); color:var(--text-sec); transition:all .15s; }
+.btn-nav:hover { border-color:var(--blue); color:var(--blue); }
+.btn-nav.primary { background:var(--blue); color:#fff; border-color:var(--blue); }
+.btn-nav.primary:hover { background:#1d4ed8; }
+.btn-nav:disabled { opacity:.35; cursor:not-allowed; pointer-events:none; }
+.step-counter { font-size:12px; color:var(--text-light); font-weight:600; }
+
+/* Sandbox */
+.sb-field { margin-bottom:12px; }
+.sb-field label { display:block; font-size:12px; font-weight:600; color:var(--text-sec); margin-bottom:5px; }
+.sb-field input, .sb-field textarea, .sb-field select { width:100%; border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:8px 10px; font-size:13px; background:var(--bg); color:var(--text); font-family:inherit; resize:vertical; }
+.sb-field textarea { min-height:64px; }
+.sb-hint { font-size:11px; color:var(--text-light); margin-top:4px; }
+.sb-statement-list { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+.sb-stmt { border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:10px 12px; background:var(--bg); }
+.sb-stmt-text { font-size:13px; line-height:1.5; margin-bottom:8px; font-style:italic; }
+.sb-vote-row { display:flex; gap:7px; }
+.sb-vote-row button { border:1.5px solid; border-radius:20px; padding:4px 12px; font-size:11px; font-weight:600; cursor:pointer; background:transparent; transition:all .15s; }
+.sb-vote-row .sv-agree { border-color:var(--green); color:var(--green); }
+.sb-vote-row .sv-agree:hover,.sb-vote-row .sv-agree.sel { background:var(--green); color:#fff; }
+.sb-vote-row .sv-dis { border-color:var(--red); color:var(--red); }
+.sb-vote-row .sv-dis:hover,.sb-vote-row .sv-dis.sel { background:var(--red); color:#fff; }
+.sb-vote-row .sv-pass { border-color:#94a3b8; color:#64748b; }
+.sb-vote-row .sv-pass:hover,.sb-vote-row .sv-pass.sel { background:#94a3b8; color:#fff; }
+.add-stmt-row { display:flex; gap:8px; }
+.add-stmt-row input { flex:1; border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:7px 10px; font-size:13px; font-family:inherit; background:var(--bg); color:var(--text); }
+.add-stmt-row button { background:var(--bg-sec); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:7px 12px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; }
+.sb-debate-feed { max-height:160px; overflow-y:auto; margin-bottom:10px; display:flex; flex-direction:column; gap:7px; }
+.sb-d-msg { border-radius:var(--radius-sm); padding:7px 11px; font-size:12px; line-height:1.5; }
+.sb-d-msg.user { background:var(--blue-light); border-left:3px solid var(--blue); }
+.sb-d-msg.bot { background:var(--bg-ter); border-left:3px solid var(--border-dark); }
+.sb-d-author { font-size:10px; font-weight:700; margin-bottom:2px; }
+.policy-brief { background:var(--bg); border:1.5px solid var(--border); border-radius:var(--radius); padding:20px; }
+.policy-brief h3 { font-size:16px; font-weight:800; margin-bottom:4px; }
+.policy-brief .pb-meta { font-size:11px; color:var(--text-light); margin-bottom:14px; }
+.pb-section { margin-bottom:12px; }
+.pb-section h4 { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-sec); margin-bottom:5px; }
+.pb-section p { font-size:13px; color:var(--text); line-height:1.6; }
+.pb-consensus-item { display:flex; gap:8px; font-size:12px; padding:4px 0; border-bottom:1px solid var(--bg-ter); color:#374151; }
+.pb-consensus-item::before { content:"✓"; color:var(--green); font-weight:700; flex-shrink:0; }
+.pb-action { background:var(--blue-light); border:1.5px solid var(--blue-mid); border-radius:var(--radius-sm); padding:10px 14px; font-size:13px; color:var(--blue); font-weight:600; margin-top:10px; }
+</style>
+<section id="process" class="section">
+  <div class="inner">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title">The vTaiwan Process</h2>
+    <p class="section-sub">Two ways to explore the four stages — follow the real Uber case to see how vTaiwan broke a 6-year deadlock, or run your own session from scratch.</p>
+
+    <div class="mode-tabs">
+      <button class="mode-tab active" onclick="switchMode('wt',this)">🚗 Uber Case Walkthrough<span class="mode-sub">Follow the real case step by step</span></button>
+      <button class="mode-tab" onclick="switchMode('sb',this)">✏️ Try Your Own Session<span class="mode-sub">Run your own vTaiwan process</span></button>
+    </div>
+
+    <!-- ══ WALKTHROUGH ══ -->
+    <div id="mode-wt">
+
+      <!-- Step indicator -->
+      <div class="step-indicator" id="wt-steps">
+        <div class="step-node"><div class="step-circle active" id="wtc-0">1</div><div class="step-label active" id="wtl-0">Raise Issue</div></div>
+        <div class="step-connector" id="wtcon-0"></div>
+        <div class="step-node"><div class="step-circle" id="wtc-1">2</div><div class="step-label" id="wtl-1">Pol.is Polls</div></div>
+        <div class="step-connector" id="wtcon-1"></div>
+        <div class="step-node"><div class="step-circle" id="wtc-2">3</div><div class="step-label" id="wtl-2">Debate</div></div>
+        <div class="step-connector" id="wtcon-2"></div>
+        <div class="step-node"><div class="step-circle" id="wtc-3">4</div><div class="step-label" id="wtl-3">Legislation</div></div>
+      </div>
+
+      <!-- Step 1: Raise Issue -->
+      <div class="wt-panel active" id="wt-0">
+        <div class="wt-stage-header"><div class="wt-stage-num" style="background:var(--blue-light);">📋</div><div><h3>Stage 1 — Raise the Issue</h3><p>August 2015 · Discourse + g0v Wednesday Hackathon · Tool: structured online forum</p></div></div>
+        <div style="background:var(--bg-sec); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:14px 16px; margin-bottom:16px; font-size:13px; line-height:1.7; color:#374151;">
+          <strong>The situation:</strong> Uber launched in Taiwan in 2013. Taxi unions demanded an immediate ban, calling it illegal and unfair. Uber refused to comply with existing taxi regulations and continued operating. For <strong>6 years</strong>, the Legislative Yuan could not agree on a framework — existing law simply had no category for app-dispatched private vehicles. The Ministry of Transport brought the issue to vTaiwan as a last resort.
+        </div>
+        <h4 style="font-size:12px; font-weight:700; color:var(--text-sec); text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px;">Three stakeholder groups entered the process</h4>
+        <div class="stakeholder-row">
+          <div class="stakeholder-card conflict">
+            <div class="s-icon">🚕</div>
+            <h4>Taxi Industry</h4>
+            <p>Demanded Uber be banned or forced to follow taxi regulations. Feared loss of livelihood.</p>
+          </div>
+          <div class="stakeholder-card conflict">
+            <div class="s-icon">📱</div>
+            <h4>Uber & Platforms</h4>
+            <p>Argued they were a tech company, not a taxi company. Wanted a new, lighter regulatory category.</p>
+          </div>
+          <div class="stakeholder-card neutral">
+            <div class="s-icon">🏛</div>
+            <h4>Government / Consumers</h4>
+            <p>Needed a workable legal framework. Wanted safety, competition, and fair market conditions.</p>
+          </div>
+        </div>
+        <div style="font-size:13px; color:var(--text-sec); background:var(--bg-sec); border-radius:var(--radius-sm); border:1.5px solid var(--border); padding:12px 14px;">
+          <strong>Key question put to vTaiwan:</strong> "How should Taiwan regulate ride-hailing services like Uber, in a way that is fair to all parties?"<br><br>
+          The Ministry of Transport officially confirmed engagement. The issue moved to Stage 2.
+        </div>
+      </div>
+
+      <!-- Step 2: Pol.is -->
+      <div class="wt-panel" id="wt-1">
+        <div class="wt-stage-header"><div class="wt-stage-num" style="background:var(--green-light);">🗺️</div><div><h3>Stage 2 — Opinion Mapping with Pol.is</h3><p>~1,500 participants · No replies allowed · ML clusters opinions by similarity</p></div></div>
+        <p style="font-size:13px; color:var(--text-sec); margin-bottom:14px; line-height:1.6;">Citizens voted on statements written by all sides. Pol.is grouped voters into clusters (pro-taxi and pro-Uber camps) and identified which statements found agreement <em>across</em> both groups — the seeds of a deal.</p>
+
+        <div class="cluster-row">
+          <div class="cluster-card" style="border-color:#fca5a5; background:#fef2f2;">
+            <h4 style="color:#dc2626;">🚕 Pro-Taxi Cluster (majority)</h4>
+            <div class="cluster-item">Uber should be banned or face the same strict rules as taxis</div>
+            <div class="cluster-item">Platform drivers have an unfair advantage by avoiding taxi licensing</div>
+            <div class="cluster-item">Passengers in unregulated vehicles are at safety risk</div>
+          </div>
+          <div class="cluster-card" style="border-color:#93c5fd; background:var(--blue-light);">
+            <h4 style="color:var(--blue);">📱 Pro-Uber Cluster</h4>
+            <div class="cluster-item">Innovation should not be blocked by outdated taxi regulations</div>
+            <div class="cluster-item">Drivers should be free to choose which platform they work for</div>
+            <div class="cluster-item">Consumer choice and lower prices benefit the public</div>
+          </div>
+        </div>
+
+        <p style="font-size:12px; font-weight:700; color:var(--text-sec); margin-bottom:8px; text-transform:uppercase; letter-spacing:.5px;">Vote on these statements yourself — as the 1,500 participants did:</p>
+        <div id="wt-polis-stmts"></div>
+
+        <div class="consensus-reveal" id="wt-consensus" style="display:none;">
+          <h4>✅ Cross-group consensus emerged on these points:</h4>
+          <span class="consensus-tag">Fair & equal regulatory framework</span>
+          <span class="consensus-tag">Vehicles must be registered</span>
+          <span class="consensus-tag">Mandatory passenger insurance</span>
+          <span class="consensus-tag">Drivers can join multiple platforms</span>
+          <span class="consensus-tag">Platform must be legally registered</span>
+          <span class="consensus-tag">No exclusivity contracts for drivers</span>
+          <span class="consensus-tag">Clear consumer complaint mechanism</span>
+          <p style="font-size:12px; color:#166534; margin-top:10px; line-height:1.5;">Both camps — despite opposing opening positions — agreed on these 7 points. Pol.is elevated them as the foundation for Stage 3.</p>
+        </div>
+      </div>
+
+      <!-- Step 3: Debate -->
+      <div class="wt-panel" id="wt-2">
+        <div class="wt-stage-header"><div class="wt-stage-num" style="background:var(--amber-light);">🗣️</div><div><h3>Stage 3 — Reflection Meeting</h3><p>In-person · Livestreamed publicly · Uber + Taxi Union + Ministry of Transport</p></div></div>
+        <p style="font-size:13px; color:var(--text-sec); margin-bottom:14px; line-height:1.6;">The Pol.is consensus map was the agenda. Parties only debated the <em>gaps</em> — the 7 agreed points were taken as given. This made the meeting far more productive than 6 years of prior negotiations. Watch how the conversation evolved:</p>
+
+        <div class="debate-replay" id="wt-replay">
+          <div class="dr-msg taxi"><div class="dr-author">🚕 Taiwan Taxi Union</div>"We accept the consensus points — but we insist that vehicle registration must be verified, not self-reported. Uber drivers have been operating without proper checks."</div>
+          <div class="dr-msg uber"><div class="dr-author">📱 Uber Representative</div>"We agree on verification. We're willing to submit our driver and vehicle data to a government registry, as long as the same requirement applies to taxis."</div>
+          <div class="dr-msg govt"><div class="dr-author">🏛 Ministry of Transport</div>"Equal treatment is a consensus point — it will apply to all parties. The question is: who administers the registry and what data is required?"</div>
+          <div class="dr-msg taxi"><div class="dr-author">🚕 Taiwan Taxi Union</div>"On insurance: the policy must cover passengers from the moment they enter the vehicle. Not just when the meter starts."</div>
+          <div class="dr-msg uber"><div class="dr-author">📱 Uber Representative</div>"We have no objection to that. We already offer this in several other markets. We can extend it here."</div>
+          <div class="dr-msg consensus"><div class="dr-author">✅ Facilitator (g0v) — Rough Consensus Recorded</div>"Both parties agree on mandatory per-trip insurance coverage. This matches the Pol.is consensus point. Recording as agreed."</div>
+        </div>
+
+        <div style="font-size:13px; background:var(--bg-sec); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; line-height:1.6;">
+          <strong>Key outcome of Stage 3:</strong> The meeting took 3 sessions over several weeks. The facilitator documented each agreed point in a public record. Remaining disputes (e.g., whether existing taxi drivers could switch to platform dispatch) were resolved through compromise proposals from both sides. The Ministry drafted a regulatory framework directly from these session notes.
+        </div>
+      </div>
+
+      <!-- Step 4: Legislation -->
+      <div class="wt-panel" id="wt-3">
+        <div class="wt-stage-header"><div class="wt-stage-num" style="background:var(--purple-light);">⚖️</div><div><h3>Stage 4 — Legislative Action</h3><p>Ministry of Transport · Regulatory directive · 6-year deadlock resolved</p></div></div>
+        <p style="font-size:13px; color:var(--text-sec); margin-bottom:14px; line-height:1.6;">The government enacted a new ride-hailing framework based directly on the 7 vTaiwan consensus points. Uber was legalized under these conditions — the first time the platform operated legally in Taiwan:</p>
+
+        <div class="conditions-grid">
+          <div class="condition-item"><div class="c-num">1</div>All ride-hailing platforms must be legally registered in Taiwan</div>
+          <div class="condition-item"><div class="c-num">2</div>All vehicles must be registered with the government</div>
+          <div class="condition-item"><div class="c-num">3</div>Mandatory passenger insurance on every trip</div>
+          <div class="condition-item"><div class="c-num">4</div>Drivers may work for multiple platforms — no exclusivity contracts</div>
+          <div class="condition-item"><div class="c-num">5</div>Same safety inspection standards as licensed taxis</div>
+          <div class="condition-item"><div class="c-num">6</div>Clear consumer complaint and dispute mechanism</div>
+          <div class="condition-item"><div class="c-num">7</div>Fair and equal regulatory framework for taxis and platforms alike</div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:16px; text-align:center;">
+          <div style="background:var(--blue-light); border:1.5px solid var(--blue-mid); border-radius:var(--radius-sm); padding:14px;">
+            <div style="font-size:26px; font-weight:900; color:var(--blue);">6 yrs</div>
+            <div style="font-size:11px; color:var(--text-sec);">Legislative deadlock broken</div>
+          </div>
+          <div style="background:var(--green-light); border:1.5px solid var(--green-mid); border-radius:var(--radius-sm); padding:14px;">
+            <div style="font-size:26px; font-weight:900; color:var(--green);">~1,500</div>
+            <div style="font-size:11px; color:var(--text-sec);">Citizens participated</div>
+          </div>
+          <div style="background:var(--amber-light); border:1.5px solid var(--amber-mid); border-radius:var(--radius-sm); padding:14px;">
+            <div style="font-size:26px; font-weight:900; color:var(--amber);">100%</div>
+            <div style="font-size:11px; color:var(--text-sec);">Consensus points adopted</div>
+          </div>
+        </div>
+        <div style="background:var(--green-light); border:1.5px solid var(--green-mid); border-radius:var(--radius-sm); padding:14px; font-size:13px; color:#166534; line-height:1.6;">
+          <strong>What made this work:</strong> vTaiwan didn't ask people to compromise their values — it found the overlap that already existed. Both taxi drivers and Uber users agreed on safety and fairness in principle. Pol.is made that latent agreement <em>visible</em>, removing the adversarial framing that had kept legislators stuck for six years.
+        </div>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn-nav" id="wt-back" onclick="wtNav(-1)" disabled>← Back</button>
+        <span class="step-counter" id="wt-counter">Step 1 of 4</span>
+        <button class="btn-nav primary" id="wt-next" onclick="wtNav(1)">Next Stage →</button>
+      </div>
+    </div>
+
+    <!-- ══ SANDBOX ══ -->
+    <div id="mode-sb" style="display:none;">
+
+      <div class="step-indicator" id="sb-steps">
+        <div class="step-node"><div class="step-circle active" id="sbc-0">1</div><div class="step-label active" id="sbl-0">Your Issue</div></div>
+        <div class="step-connector" id="sbcon-0"></div>
+        <div class="step-node"><div class="step-circle" id="sbc-1">2</div><div class="step-label" id="sbl-1">Statements</div></div>
+        <div class="step-connector" id="sbcon-1"></div>
+        <div class="step-node"><div class="step-circle" id="sbc-2">3</div><div class="step-label" id="sbl-2">Debate</div></div>
+        <div class="step-connector" id="sbcon-2"></div>
+        <div class="step-node"><div class="step-circle" id="sbc-3">4</div><div class="step-label" id="sbl-3">Policy Brief</div></div>
+      </div>
+
+      <!-- SB Step 1: Issue -->
+      <div class="wt-panel active" id="sb-0">
+        <div class="wt-stage-header"><div class="wt-stage-num" style="background:var(--blue-light);">📋</div><div><h3>Stage 1 — Define Your Issue</h3><p>What policy problem should be brought to vTaiwan? Define the context and the stakeholders.</p></div></div>
+        <div class="sb-field"><label>Issue title</label><input type="text" id="sb-title" placeholder="e.g. Regulating AI-generated content in journalism"></div>
+        <div class="sb-field"><label>Describe the problem</label><textarea id="sb-problem" placeholder="What is the policy gap? Who is affected? Why has it been hard to resolve?"></textarea></div>
+        <div class="sb-field">
+          <label>Stakeholder group A (e.g. industry)</label>
+          <input type="text" id="sb-stk-a" placeholder="e.g. Tech companies">
+          <div class="sb-hint">Their main concern or position</div>
+          <input type="text" id="sb-stk-a-pos" placeholder="e.g. Don't restrict AI — it drives innovation" style="margin-top:5px;">
+        </div>
+        <div class="sb-field">
+          <label>Stakeholder group B (e.g. affected public)</label>
+          <input type="text" id="sb-stk-b" placeholder="e.g. Journalists / Media unions">
+          <div class="sb-hint">Their main concern or position</div>
+          <input type="text" id="sb-stk-b-pos" placeholder="e.g. AI content erodes trust and threatens jobs" style="margin-top:5px;">
+        </div>
+      </div>
+
+      <!-- SB Step 2: Statements -->
+      <div class="wt-panel" id="sb-1">
+        <div class="wt-stage-header"><div class="wt-stage-num" style="background:var(--green-light);">🗺️</div><div><h3>Stage 2 — Add Statements & Vote</h3><p>Write short, clear statements — one idea per statement. Then vote on each one.</p></div></div>
+        <p style="font-size:13px; color:var(--text-sec); margin-bottom:12px; line-height:1.5;">In a real vTaiwan session, citizens write and vote on hundreds of statements. Add 2–4 below, then vote. You'll see which ones could form a consensus.</p>
+        <div class="sb-statement-list" id="sb-stmt-list"></div>
+        <div class="add-stmt-row">
+          <input type="text" id="sb-new-stmt" placeholder="Write a statement (one idea, one sentence)..." maxlength="140" onkeydown="if(event.key==='Enter')sbAddStmt()">
+          <button onclick="sbAddStmt()">+ Add</button>
+        </div>
+        <p class="sb-hint" style="margin-top:8px;">No replies allowed — just Agree, Disagree, or Pass on each statement.</p>
+      </div>
+
+      <!-- SB Step 3: Debate -->
+      <div class="wt-panel" id="sb-2">
+        <div class="wt-stage-header"><div class="wt-stage-num" style="background:var(--amber-light);">🗣️</div><div><h3>Stage 3 — Reflection & Debate</h3><p>Using the consensus from Stage 2 as the agenda, parties discuss remaining gaps.</p></div></div>
+        <div id="sb-debate-context" style="background:var(--bg-sec); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; font-size:13px; margin-bottom:12px; color:#374151; line-height:1.6;"></div>
+        <div class="sb-debate-feed" id="sb-debate-feed"></div>
+        <div class="debate-input">
+          <input type="text" id="sb-debate-in" placeholder="Add your point to the debate..." maxlength="140" onkeydown="if(event.key==='Enter')sbSendDebate()">
+          <button onclick="sbSendDebate()">Send</button>
+        </div>
+      </div>
+
+      <!-- SB Step 4: Policy Brief -->
+      <div class="wt-panel" id="sb-3">
+        <div class="wt-stage-header"><div class="wt-stage-num" style="background:var(--purple-light);">⚖️</div><div><h3>Stage 4 — Your Policy Brief</h3><p>Generated from your inputs — a vTaiwan-style rough consensus document.</p></div></div>
+        <div class="policy-brief" id="sb-brief">
+          <p style="font-size:13px; color:var(--text-sec);">Complete the previous stages to generate your policy brief.</p>
+        </div>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn-nav" id="sb-back" onclick="sbNav(-1)" disabled>← Back</button>
+        <span class="step-counter" id="sb-counter">Stage 1 of 4</span>
+        <button class="btn-nav primary" id="sb-next" onclick="sbNav(1)">Continue to Stage 2 →</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ CASES ═══ -->
+<section id="cases" class="section alt">
+  <div class="inner">
+    <div class="section-label">Real Results</div>
+    <h2 class="section-title">Case Studies</h2>
+    <p class="section-sub">vTaiwan handled 26 national issues between 2015–2018. 80% resulted in decisive government action. Here are the landmark cases.</p>
+
+    <div class="case-tabs">
+      <button class="case-tab active" onclick="showCase('uber',this)">🚗 Uber / Ridesharing</button>
+      <button class="case-tab" onclick="showCase('alcohol',this)">🍶 Online Alcohol Sales</button>
+      <button class="case-tab" onclick="showCase('fintech',this)">💳 Fintech Sandbox</button>
+      <button class="case-tab" onclick="showCase('ai',this)">🤖 AI Governance (2024)</button>
+    </div>
+
+    <div class="card" style="padding:24px;">
+      <div class="case-panel active" id="case-uber">
+        <span class="outcome-chip outcome-pass">✅ Legislation Passed</span>
+        <div class="case-stats">
+          <div class="case-stat"><div class="num">~1,500</div><div class="lbl">Participants</div></div>
+          <div class="case-stat"><div class="num">7</div><div class="lbl">Consensus points</div></div>
+          <div class="case-stat"><div class="num">6 yrs</div><div class="lbl">Deadlock broken</div></div>
+        </div>
+        <p class="case-text">Uber's arrival in Taiwan triggered a fierce standoff between taxi unions and platform advocates. Traditional legislative channels had been deadlocked for six years. vTaiwan's Pol.is session revealed that despite initial polarization, both camps agreed on: a fair regulatory regime, mandatory insurance, driver registration, and multi-platform flexibility for drivers. The Ministry of Transport held three-way talks with Uber and taxi unions using this consensus as the agenda. The result: Uber was legalized under 7 conditions — the most significant early win for vTaiwan, and proof that digital deliberation could break real legislative deadlocks.</p>
+      </div>
+      <div class="case-panel" id="case-alcohol">
+        <span class="outcome-chip outcome-pass">✅ Policy Enacted</span>
+        <div class="case-stats">
+          <div class="case-stat"><div class="num">~450</div><div class="lbl">Participants</div></div>
+          <div class="case-stat"><div class="num">Weeks</div><div class="lbl">Time to consensus</div></div>
+          <div class="case-stat"><div class="num">3</div><div class="lbl">Stakeholder groups</div></div>
+        </div>
+        <p class="case-text">This was vTaiwan's <strong>first test case</strong>. Taiwan's Finance Ministry was already planning to legalize online alcohol sales but faced conflicting demands from alcohol merchants, e-commerce platforms, and child safety advocates. Starting in early March 2016, ~450 citizens proposed solutions and voted on them via vTaiwan. Within weeks they had formulated recommendations covering age verification requirements, licensed seller conditions, and advertising restrictions — giving the Ministry a clear, publicly-legitimized policy framework. The case demonstrated that vTaiwan could work quickly and produce actionable results on a concrete policy problem.</p>
+      </div>
+      <div class="case-panel" id="case-fintech">
+        <span class="outcome-chip outcome-pass">✅ Act Passed (accelerated)</span>
+        <div class="case-stats">
+          <div class="case-stat"><div class="num">Stage skipped</div><div class="lbl">Reflection omitted</div></div>
+          <div class="case-stat"><div class="num">Fintech Act</div><div class="lbl">Outcome</div></div>
+          <div class="case-stat"><div class="num">2018</div><div class="lbl">Enacted</div></div>
+        </div>
+        <p class="case-text">The Fintech Sandbox Act created a 3-year regulatory safe zone for financial technology experiments within Taiwan's otherwise tightly controlled financial sector. Notably, the reflection stage was <strong>skipped entirely</strong> under legislative time pressure — a rare adaptation. This shows vTaiwan's flexibility but also its vulnerability: political acceleration can short-circuit deliberation depth. The sandbox allowed startups to test products outside normal financial regulations, positioning Taiwan as a regional fintech hub. Critics point to this case as evidence that the process can be instrumentalized when government has already decided an outcome.</p>
+      </div>
+      <div class="case-panel" id="case-ai">
+        <span class="outcome-chip outcome-ongoing">🔄 Ongoing Process</span>
+        <div class="case-stats">
+          <div class="case-stat"><div class="num">2023</div><div class="lbl">Revival year</div></div>
+          <div class="case-stat"><div class="num">LLM-powered</div><div class="lbl">New AI tools</div></div>
+          <div class="case-stat"><div class="num">Volunteer</div><div class="lbl">Now civic-led</div></div>
+        </div>
+        <p class="case-text">After going largely dormant post-2018, vTaiwan was relaunched in 2023 as a fully volunteer-driven civic laboratory. The new iteration integrates AI tools — Claude and ChatGPT — to analyze and summarize Pol.is deliberation outputs. In December 2024, vTaiwan hosted an AI governance deliberation event. Findings were presented to Taiwan's National Human Rights Commission in March 2025. Taiwan subsequently passed the <strong>AI Basic Act</strong> (December 2025), establishing 7 core principles: sustainability and well-being, human autonomy, privacy and data governance, cybersecurity and safety, transparency and explainability, fairness and non-discrimination, and accountability.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ LIMITATIONS ═══ -->
+<section id="limitations" class="section">
+  <div class="inner">
+    <div class="section-label">Critical Assessment</div>
+    <h2 class="section-title">Limitations</h2>
+    <p class="section-sub">vTaiwan is a genuine innovation in democratic participation — but it has real structural, political, and social limitations that explain why it has not been more widely replicated or sustained.</p>
+
+    <div class="limitation-grid">
+      <div class="limitation-card" style="border-top:3px solid var(--red);">
+        <div class="l-icon">🏛</div>
+        <h4>No Legal Mandate</h4>
+        <p>The government is not legally obligated to adopt vTaiwan's recommendations. Without institutional backing, the platform's impact depends entirely on political will. The Tsai administration (2016–2024) used it far less than its predecessor, and one legislator described it as "not a huge priority" that had come "close to death."</p>
+      </div>
+      <div class="limitation-card" style="border-top:3px solid var(--amber);">
+        <div class="l-icon">🔒</div>
+        <h4>Top-Down Trigger</h4>
+        <p>Despite being born from a grassroots movement, vTaiwan requires a government agency to release an issue first. Citizens cannot independently initiate the process, making engagement reactive rather than proactive — a fundamental contradiction with its participatory promise.</p>
+      </div>
+      <div class="limitation-card" style="border-top:3px solid var(--purple);">
+        <div class="l-icon">📱</div>
+        <h4>Digital Divide & Exclusion</h4>
+        <p>Participation skewed heavily toward ages 20–40 with high digital literacy. In the Uber case, taxi drivers directly affected by the outcome felt marginalized because they were less comfortable with the digital tools. The "consensus" reflects who showed up, not the general public.</p>
+      </div>
+      <div class="limitation-card" style="border-top:3px solid var(--cyan);">
+        <div class="l-icon">🎯</div>
+        <h4>Narrow Scope</h4>
+        <p>The government formally limited vTaiwan to digital economy and technology issues. Broader social, economic, or political matters — housing, labor rights, healthcare — were never put on the platform, limiting its potential as a general-purpose democratic tool.</p>
+      </div>
+      <div class="limitation-card" style="border-top:3px solid var(--green);">
+        <div class="l-icon">⏱</div>
+        <h4>Process Takes Months</h4>
+        <p>A full vTaiwan cycle takes months to complete, which creates barriers for both participants who struggle to sustain engagement and governments facing political time pressure — as seen in the Fintech case where the reflection stage was skipped entirely.</p>
+      </div>
+      <div class="limitation-card" style="border-top:3px solid #374151;">
+        <div class="l-icon">📉</div>
+        <h4>Post-2018 Collapse</h4>
+        <p>Member attrition, the government's shift toward the parallel Join platform, COVID-19, and changing political priorities caused vTaiwan to functionally halt after 2018. The 2023 revival is promising but remains fully volunteer-dependent with no institutional mandate or funding.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER / SOURCES ═══ -->
+<footer>
+  <div class="footer-inner">
+    <h3>Sources & Further Reading</h3>
+    <div class="sources-grid">
+      <div><a href="https://participedia.net/method/vtaiwan" target="_blank">vTaiwan — Participedia</a></div>
+      <div><a href="https://www.technologyreview.com/2018/08/21/240284/the-simple-but-ingenious-system-taiwan-uses-to-crowdsource-its-laws/" target="_blank">The simple but ingenious system Taiwan uses to crowdsource its laws — MIT Technology Review</a></div>
+      <div><a href="https://congress.crowd.law/case-vtaiwan.html" target="_blank">vTaiwan — CrowdLaw for Congress</a></div>
+      <div><a href="https://rebootdemocracy.ai/blog/was-vtaiwan-such-a-big-flop-after-all" target="_blank">Was vTaiwan such a big flop, after all? — Beth Noveck</a></div>
+      <div><a href="https://www.thedailybeast.com/taiwan-tried-to-digitize-democracy-with-vtaiwan-it-was-a-huge-flop/" target="_blank">Taiwan Tried to Digitize Democracy With vTaiwan. It Was a Huge Flop — The Daily Beast</a></div>
+      <div><a href="https://www.peoplepowered.org/news-content/digital-participation-case-study-taiwan" target="_blank">vTaiwan's hybrid approach to digital deliberation with AI — People Powered</a></div>
+      <div><a href="https://en.wikipedia.org/wiki/Pol.is" target="_blank">Pol.is — Wikipedia</a></div>
+      <div><a href="https://democracy-technologies.org/participation/consensus-building-in-taiwan/" target="_blank">Lessons from Consensus Building in Taiwan — Democracy Technologies</a></div>
+      <div><a href="https://europeandemocracyhub.epd.eu/exploring-worldwide-democratic-innovations-taiwan/" target="_blank">Digital Democracy in Taiwan — European Democracy Hub</a></div>
+      <div><a href="https://compdemocracy.org/case-studies/2014-vtaiwan/" target="_blank">vTaiwan — Computational Democracy Project</a></div>
+      <div><a href="https://en.wikipedia.org/wiki/Audrey_Tang" target="_blank">Audrey Tang — Wikipedia</a></div>
+      <div><a href="https://en.wikipedia.org/wiki/Jaclyn_Tsai" target="_blank">Jaclyn Tsai — Wikipedia</a></div>
+      <div><a href="https://en.wikipedia.org/wiki/G0v" target="_blank">g0v movement — Wikipedia</a></div>
+      <div><a href="https://www.taiwan-panorama.com/en/Articles/Details?Guid=736828dd-9df4-48fe-9383-71a5353cf4b7" target="_blank">Pioneers of Open Government: g0v's Civic Hackers — Taiwan Panorama</a></div>
+      <div><a href="https://www.theguardian.com/world/2024/mar/21/what-is-taiwan-sunflower-movement-china" target="_blank">How the Sunflower Movement birthed a generation — The Guardian</a></div>
+      <div><a href="https://nvdatabase.swarthmore.edu/node/5064" target="_blank">Taiwan's Sunflower Movement halts trade deal — Global Nonviolent Action Database</a></div>
+      <div><a href="https://carnegieendowment.org/research/2018/08/the-activist-legacy-of-taiwans-sunflower-movement" target="_blank">The activist legacy of Taiwan's Sunflower Movement — Carnegie Endowment</a></div>
+      <div><a href="https://www.freiheit.org/taiwan/how-public-participation-can-improve-ai-governance-vtaiwans-initiatives" target="_blank">How Public Participation Can Improve AI Governance — Freiheit Foundation</a></div>
+      <div><a href="https://digicnx.network/vtaiwan-new-experiments-in-digital-democracy-january-2025/" target="_blank">vTaiwan: New Experiments in Digital Democracy (Jan 2025) — DigiCNX</a></div>
+      <div><a href="https://congress.crowd.law/files/vtaiwan-case-study.pdf" target="_blank">vTaiwan Case Study PDF — CrowdLaw for Congress</a></div>
+    </div>
+    <div class="footer-note">Research compiled May 2026. All interactive demos are illustrative simulations based on real case data.</div>
+  </div>
+</footer>
+
+<script>
+/* ═══ TIMELINE DATA ═══ */
+const tlEvents = [
+  { date:"Pre-17th c.", era:"Colonial & Imperial Era", title:"Indigenous Taiwan", tag:"Colonial", cat:"colonial", body:"Taiwan was inhabited by Austronesian indigenous peoples for thousands of years before European contact, with distinct languages, cultures, and governance structures.", pills:[] },
+  { date:"1624–1662", era:null, title:"Dutch & Spanish colonization", tag:"Colonial", cat:"colonial", body:"The Dutch East India Company (VOC) controlled southern Taiwan from 1624; Spain briefly held the north (1626–1642). Both exploited Taiwan's trade position and introduced Han Chinese labor migration.", pills:[] },
+  { date:"1683–1895", era:null, title:"Qing Dynasty rule", tag:"Imperial", cat:"colonial", body:"After the Ming loyalist Koxinga expelled the Dutch, the Qing Dynasty absorbed Taiwan. The island remained a frontier territory with limited governance. Indigenous populations were increasingly displaced.", pills:[] },
+  { date:"1895–1945", era:null, title:"Japanese colonial rule", tag:"Colonial", cat:"colonial", body:"Taiwan was ceded to Japan under the Treaty of Shimonoseki after China's defeat in the First Sino-Japanese War. Japan modernized Taiwan's infrastructure, education, and economy — under authoritarian colonial rule. A distinct Taiwanese identity began to form.", pills:[] },
+  { date:"1945–1949", era:"KMT & Republic of China", title:"ROC takes control — KMT arrives", tag:"KMT", cat:"democratic", body:"After Japan's WWII defeat, the ROC under Chiang Kai-shek took control of Taiwan. In 1949, after losing the civil war to the CCP, the KMT retreated to Taiwan with ~1.2 million mainland Chinese and established the ROC government in Taipei.", pills:["1.2M mainland Chinese arrived","ROC claims mainland sovereignty"] },
+  { date:"1949–1987", era:null, title:"Martial law — 38 years", tag:"Authoritarian", cat:"democratic", key:true, body:"Taiwan lived under martial law — one of the longest periods in modern history. The KMT ran a single-party state, suppressing political opposition, free press, and civil society. The 228 Incident (1947) and subsequent White Terror saw thousands killed or imprisoned.", pills:["38 years of martial law","~140,000 political prisoners","Longest martial law in history"] },
+  { date:"1987", era:"Democratic Transition", title:"Martial law lifted", tag:"Reform", cat:"democratic", body:"President Chiang Ching-kuo lifted martial law on July 15, 1987, opening the door to political liberalization. Opposition parties were legalized and civil society began to emerge rapidly.", pills:[] },
+  { date:"1991–1996", era:null, title:"Wave of democratic reforms", tag:"Reform", cat:"democratic", key:true, body:"Constitutional reforms transformed Taiwan into a multiparty democracy. In 1991, 'mainlander' legislators who had held seats since 1947 were retired. In 1992 the Legislative Yuan was fully re-elected. In 1996, Taiwan held its first direct presidential election — watched anxiously by Beijing, which responded with military exercises.", pills:["1992: First free legislative elections","1996: First direct presidential vote","China fired missiles near Taiwan"] },
+  { date:"2000", era:null, title:"DPP wins presidency — first power transfer", tag:"DPP", cat:"democratic", body:"Chen Shui-bian (DPP) won the presidential election, ending 55 years of KMT rule. The DPP, founded in 1986, holds a distinct Taiwanese identity platform and is skeptical of economic integration with mainland China.", pills:["First non-KMT president","55 years of KMT rule ended"] },
+  { date:"~2008 onwards", era:"Rising Tensions & Civil Society", title:"Deep societal fault lines emerge", tag:"Crisis", cat:"crisis", key:true, body:"Economic insecurity deepened as inequality widened and upward mobility stalled — especially for young Taiwanese. Institutional distrust grew over opaque, unaccountable governance. New social media enabled rapid civic mobilization. The g0v civic tech community formed around 2012.", pills:["Rising youth unemployment","Widening inequality","g0v civic tech community ~2012"] },
+  { date:"June 2013", era:null, title:"CSSTA signed — Cross-Strait trade deal", tag:"Crisis", cat:"crisis", key:true, body:"Taiwan and China signed the Cross-Strait Service Trade Agreement (CSSTA), deepening economic integration. Critics feared Beijing leverage over Taiwan's sovereignty. The review was marred: only KMT legislators held public hearings; DPP's allotted time expired. KMT then moved toward unilateral passage, bypassing democratic scrutiny.", pills:["Only KMT held public hearings","DPP review period expired","No cross-party amendment allowed"] },
+  { date:"March 18, 2014", era:"🌻 The Sunflower Movement", title:"Students occupy the Legislative Yuan", tag:"Sunflower", cat:"sunflower", key:true, body:"Hundreds of university students stormed and occupied Taiwan's Legislative Yuan to halt the CSSTA. The 24-day occupation was powered by social media and drew mass public sympathy. Leader Lin Fei-fan: 'Ukraine and Taiwan faced the same question — joining the world or becoming in orbit of an authoritarian state.'", pills:["24-day occupation","Police used water cannons & batons","Livestreamed globally"] },
+  { date:"March 23, 2014", era:null, title:"Executive Yuan briefly seized", tag:"Sunflower", cat:"sunflower", body:"A splinter group occupied the Executive Yuan (cabinet building). Police cleared them forcibly the same night. The incident sharpened the movement's commitment to nonviolence and democratic legitimacy under the core student leadership.", pills:[] },
+  { date:"March 25, 2014", era:null, title:"Negotiations with President Ma Ying-jeou", tag:"Sunflower", cat:"sunflower", body:"President Ma agreed to negotiate. Students proposed a broad legislative oversight mechanism for all cross-strait trade agreements — shifting from opposing one deal to demanding systemic institutional reform.", pills:["Demanded cross-strait oversight law","Shifted from specific to systemic demands"] },
+  { date:"March 30, 2014", era:null, title:"500,000 march outside Presidential Office", tag:"Sunflower", cat:"sunflower", key:true, body:"The largest protest in Taiwan's history. Over 500,000 people gathered in a resolutely nonviolent demonstration. 53% of the Taiwanese population expressed support. International media attention surged.", pills:["500,000+ protesters","Largest protest in Taiwan's history","53% national public support"] },
+  { date:"April 6–7, 2014", era:null, title:"Legislative speaker halts the bill — occupation ends", tag:"Sunflower", cat:"sunflower", key:true, body:"Parliamentary Speaker Wang Jin-Pyng announced the CSSTA would not proceed until public oversight mechanisms were established. Students voted to end the occupation. The CSSTA has never been ratified.", pills:["CSSTA never ratified","Public oversight required","Occupation ended after 24 days"] },
+  { date:"Dec 2014", era:"Aftermath & vTaiwan", title:"DPP landslide in local elections", tag:"Aftermath", cat:"aftermath", body:"Riding Sunflower civic energy, the DPP won sweeping local elections. Many Sunflower participants transitioned from protest into formal political roles.", pills:["DPP won most major cities"] },
+  { date:"Dec 2014 – Early 2015", era:null, title:"vTaiwan platform launched", tag:"vTaiwan", cat:"aftermath", key:true, body:"Jaclyn Tsai (Minister without Portfolio) commissioned the g0v community to build vTaiwan at a hackathon. The platform translated the movement's demand for participatory democracy into an institutional mechanism — citizens could now engage directly in policy formation through structured online-offline consultation.", pills:["Co-created with g0v community","Commissioned by Jaclyn Tsai","Set precedent for participatory reform"] },
+  { date:"2015", era:null, title:"First test case — Online Alcohol Sales", tag:"vTaiwan", cat:"aftermath", body:"vTaiwan's first test: regulating online alcohol sales. ~450 citizens produced age-verification and licensing recommendations within weeks. The Finance Ministry adopted the framework. Proof the platform could work quickly on a concrete policy problem.", pills:["~450 participants","Weeks to consensus","Policy enacted"] },
+  { date:"2015–2018", era:null, title:"vTaiwan's active legislative years", tag:"vTaiwan", cat:"aftermath", key:true, body:"vTaiwan facilitated deliberation on 26 national policy issues — Uber regulation, fintech sandbox, revenge porn laws, and more. 80% resulted in decisive government action. It broke a 6-year Uber deadlock and produced Taiwan's Fintech Sandbox Act.", pills:["26 issues deliberated","80% led to government action","Fintech Sandbox Act 2018"] },
+  { date:"2016", era:null, title:"Audrey Tang appointed Digital Minister", tag:"Aftermath", cat:"aftermath", body:"Audrey Tang, a prominent g0v hacker and Sunflower supporter, was appointed Minister without Portfolio for Digital Affairs — the first such appointment globally. Tang brought vTaiwan's participatory ethos into government, championing radical transparency and digital democracy as state policy.", pills:["First civic tech minister globally"] },
+  { date:"2023–present", era:null, title:"vTaiwan revived — AI era", tag:"vTaiwan", cat:"aftermath", body:"After going largely dormant post-2018, vTaiwan relaunched as a fully volunteer-driven civic lab. New iterations integrate LLMs (Claude, ChatGPT) to summarize deliberation. Taiwan passed the AI Basic Act in December 2025 — partially informed by vTaiwan's 2024 AI governance consultation.", pills:["Fully volunteer-led since 2023","AI tools integrated","AI Basic Act passed Dec 2025"] }
+];
+
+function renderTimeline(filter) {
+  const c = document.getElementById('tl-container');
+  c.innerHTML = '';
+  let lastEra = null;
+  tlEvents.forEach(ev => {
+    const show = filter === 'all' || ev.cat === filter;
+    if (ev.era && show) {
+      const el = document.createElement('div');
+      el.className = 'tl-era';
+      el.textContent = ev.era;
+      c.appendChild(el);
+    }
+    const wrap = document.createElement('div');
+    wrap.className = `tl-event cat-${ev.cat}${ev.key?' key-event':''}${!show?' hidden':''}`;
+    wrap.innerHTML = `<div class="tl-dot"></div>
+      <div class="tl-card" onclick="this.classList.toggle('open')">
+        <div class="tl-header">
+          <span class="tl-date">${ev.date}</span>
+          <span class="tl-title">${ev.title}</span>
+          <span class="tl-tag">${ev.tag}</span>
+          <span class="tl-chevron">▼</span>
+        </div>
+        <div class="tl-body">${ev.body}${ev.pills.length?`<div class="tl-pills">${ev.pills.map(p=>`<span class="tl-pill">${p}</span>`).join('')}</div>`:''}</div>
+      </div>`;
+    c.appendChild(wrap);
+  });
+}
+
+function filterTl(cat, btn) {
+  document.querySelectorAll('.tl-filter').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTimeline(cat);
+}
+
+/* ═══ FOUNDERS ═══ */
+function toggleFounder(card) { card.classList.toggle('open'); }
+
+/* ═══ MODE SWITCHER ═══ */
+function switchMode(mode, btn) {
+  document.querySelectorAll('.mode-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('mode-wt').style.display = mode==='wt' ? 'block' : 'none';
+  document.getElementById('mode-sb').style.display = mode==='sb' ? 'block' : 'none';
+}
+
+/* ═══ WALKTHROUGH ═══ */
+let wtStep = 0;
+const wtStmts = [
+  { text:"The government should establish a fair and equal regulatory framework applying to both taxis and ridesharing platforms.", votes:{agree:421,disagree:89,pass:43} },
+  { text:"Private passenger vehicles operating as ride-hailing services must be registered with the government.", votes:{agree:398,disagree:102,pass:55} },
+  { text:"Rideshare drivers should be allowed to work for multiple platforms without exclusivity contracts.", votes:{agree:312,disagree:230,pass:78} },
+  { text:"Mandatory passenger insurance coverage must apply to every ride-hailing trip, from pickup to drop-off.", votes:{agree:487,disagree:34,pass:32} }
+];
+let wtVoted = 0;
+
+function initWtPolis() {
+  const c = document.getElementById('wt-polis-stmts');
+  if (!c || c.innerHTML.trim()) return;
+  c.innerHTML = wtStmts.map((s,i)=>`
+    <div class="statement-card" style="margin-bottom:8px;">
+      <div class="statement-text" style="font-size:13px; line-height:1.5; margin-bottom:8px;">"${s.text}"</div>
+      <div class="vote-row">
+        <button class="vote-btn vote-agree" id="wva-${i}" onclick="wtVote(${i},'agree')">👍 Agree</button>
+        <button class="vote-btn vote-disagree" id="wvd-${i}" onclick="wtVote(${i},'disagree')">👎 Disagree</button>
+        <button class="vote-btn vote-pass" id="wvp-${i}" onclick="wtVote(${i},'pass')">— Pass</button>
+        <span class="vote-count" id="wvc-${i}" style="margin-left:auto; font-size:11px; color:var(--text-light);"></span>
+      </div>
+    </div>`).join('');
+}
+
+function wtVote(idx, type) {
+  if (document.getElementById(`wva-${idx}`).disabled) return;
+  const keys = ['wva','wvd','wvp'];
+  keys.forEach(k=>{ const b=document.getElementById(`${k}-${idx}`); b.disabled=true; b.style.opacity='.45'; });
+  const sel = type==='agree'?'wva':type==='disagree'?'wvd':'wvp';
+  document.getElementById(`${sel}-${idx}`).classList.add('sel');
+  document.getElementById(`${sel}-${idx}`).style.opacity='1';
+  wtStmts[idx].votes[type]++;
+  const tot = wtStmts[idx].votes.agree+wtStmts[idx].votes.disagree+wtStmts[idx].votes.pass;
+  document.getElementById(`wvc-${idx}`).textContent=`${tot} votes`;
+  wtVoted++;
+  if (wtVoted >= 2) document.getElementById('wt-consensus').style.display='block';
+}
+
+function wtNav(dir) {
+  const panels = document.querySelectorAll('#mode-wt .wt-panel');
+  panels[wtStep].classList.remove('active');
+  // mark done
+  document.getElementById(`wtc-${wtStep}`).className = 'step-circle done';
+  document.getElementById(`wtl-${wtStep}`).className = 'step-label done';
+  if (wtStep < 3) { document.getElementById(`wtcon-${wtStep}`).classList.add('done'); }
+  wtStep = Math.max(0, Math.min(3, wtStep + dir));
+  panels[wtStep].classList.add('active');
+  document.getElementById(`wtc-${wtStep}`).className = 'step-circle active';
+  document.getElementById(`wtl-${wtStep}`).className = 'step-label active';
+  document.getElementById('wt-back').disabled = wtStep === 0;
+  document.getElementById('wt-counter').textContent = `Step ${wtStep+1} of 4`;
+  const nextBtn = document.getElementById('wt-next');
+  if (wtStep === 3) { nextBtn.textContent = '✅ Complete'; nextBtn.disabled = true; }
+  else { nextBtn.textContent = 'Next Stage →'; nextBtn.disabled = false; }
+  if (wtStep === 1) initWtPolis();
+  if (wtStep === 2) animateReplay();
+}
+
+function animateReplay() {
+  const msgs = document.querySelectorAll('.dr-msg');
+  msgs.forEach((m,i) => setTimeout(()=>m.classList.add('shown'), i*600));
+}
+
+/* ═══ SANDBOX ═══ */
+let sbStep = 0;
+let sbStatements = [];
+let sbVotes = [];
+let sbDebatePoints = [];
+
+function sbNav(dir) {
+  if (dir === 1 && !sbValidate()) return;
+  const panels = document.querySelectorAll('#mode-sb .wt-panel');
+  panels[sbStep].classList.remove('active');
+  document.getElementById(`sbc-${sbStep}`).className='step-circle done';
+  document.getElementById(`sbl-${sbStep}`).className='step-label done';
+  if (sbStep<3) document.getElementById(`sbcon-${sbStep}`).classList.add('done');
+  sbStep = Math.max(0, Math.min(3, sbStep+dir));
+  panels[sbStep].classList.add('active');
+  document.getElementById(`sbc-${sbStep}`).className='step-circle active';
+  document.getElementById(`sbl-${sbStep}`).className='step-label active';
+  document.getElementById('sb-back').disabled = sbStep===0;
+  document.getElementById('sb-counter').textContent = `Stage ${sbStep+1} of 4`;
+  const next = document.getElementById('sb-next');
+  if (sbStep===3) { next.style.display='none'; sbGenerateBrief(); }
+  else { next.style.display=''; next.textContent = sbStep===2 ? 'Generate Policy Brief →' : `Continue to Stage ${sbStep+2} →`; }
+  if (sbStep===2) sbSetupDebate();
+}
+
+function sbValidate() {
+  if (sbStep===0) {
+    const t=document.getElementById('sb-title').value.trim();
+    const p=document.getElementById('sb-problem').value.trim();
+    if (!t||!p) { alert('Please fill in the issue title and description before continuing.'); return false; }
+  }
+  if (sbStep===1 && sbStatements.length===0) { alert('Please add at least one statement before continuing.'); return false; }
+  return true;
+}
+
+function sbAddStmt() {
+  const inp = document.getElementById('sb-new-stmt');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  sbStatements.push(txt);
+  sbVotes.push({agree:0,disagree:0,pass:0});
+  inp.value='';
+  renderSbStmts();
+}
+
+function renderSbStmts() {
+  const c = document.getElementById('sb-stmt-list');
+  c.innerHTML = sbStatements.map((s,i)=>`
+    <div class="sb-stmt">
+      <div class="sb-stmt-text">"${s}"</div>
+      <div class="sb-vote-row">
+        <button class="sv-agree${sbVotes[i]._voted?sbVotes[i]._type==='agree'?' sel':''  :''}" id="sva-${i}" onclick="sbVote(${i},'agree')" ${sbVotes[i]._voted?'disabled':''} style="${sbVotes[i]._voted?'opacity:.5':''};${sbVotes[i]._voted&&sbVotes[i]._type==='agree'?'opacity:1;background:#16a34a;color:#fff':''}">👍 Agree</button>
+        <button class="sv-dis" id="svd-${i}" onclick="sbVote(${i},'disagree')" ${sbVotes[i]._voted?'disabled':''} style="${sbVotes[i]._voted?'opacity:.5':''}${sbVotes[i]._voted&&sbVotes[i]._type==='disagree'?';opacity:1;background:#dc2626;color:#fff':''}">👎 Disagree</button>
+        <button class="sv-pass" id="svp-${i}" onclick="sbVote(${i},'pass')" ${sbVotes[i]._voted?'disabled':''} style="${sbVotes[i]._voted?'opacity:.5':''}${sbVotes[i]._voted&&sbVotes[i]._type==='pass'?';opacity:1;background:#94a3b8;color:#fff':''}">— Pass</button>
+      </div>
+    </div>`).join('');
+}
+
+function sbVote(idx, type) {
+  if (sbVotes[idx]._voted) return;
+  sbVotes[idx][type]++;
+  sbVotes[idx]._voted = true;
+  sbVotes[idx]._type = type;
+  renderSbStmts();
+}
+
+function sbSetupDebate() {
+  const title = document.getElementById('sb-title').value.trim();
+  const stkA = document.getElementById('sb-stk-a').value.trim() || 'Group A';
+  const stkB = document.getElementById('sb-stk-b').value.trim() || 'Group B';
+  const agreed = sbStatements.filter((_,i)=>sbVotes[i]._type==='agree');
+  document.getElementById('sb-debate-context').innerHTML =
+    `<strong>Issue: ${title}</strong><br>Pol.is identified <strong>${agreed.length}</strong> potential consensus point(s). The reflection meeting between <em>${stkA}</em> and <em>${stkB}</em> begins with these as the agreed foundation. Use the debate to address remaining gaps.`;
+  const feed = document.getElementById('sb-debate-feed');
+  feed.innerHTML = '';
+  if (stkA) {
+    const m = document.createElement('div'); m.className='sb-d-msg bot';
+    m.innerHTML=`<div class="sb-d-author">🏛 Facilitator (g0v)</div>Welcome. We'll focus today's session on the gaps remaining after the Pol.is stage. ${agreed.length} point(s) are already agreed — we won't re-argue those. What does ${stkA} want to raise first?`;
+    feed.appendChild(m);
+  }
+}
+
+function sbSendDebate() {
+  const inp = document.getElementById('sb-debate-in');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  sbDebatePoints.push(txt);
+  const feed = document.getElementById('sb-debate-feed');
+  const m = document.createElement('div'); m.className='sb-d-msg user';
+  m.innerHTML=`<div class="sb-d-author">👤 You</div>${txt}`;
+  feed.appendChild(m);
+  feed.scrollTop = feed.scrollHeight;
+  inp.value='';
+  setTimeout(()=>{
+    const replies = [
+      "Noted — this point will be included in the draft policy brief for the ministry's consideration.",
+      "This aligns with the Pol.is consensus data. Recording as a supporting argument.",
+      "The other stakeholders have raised similar concerns. This strengthens the case for inclusion.",
+      "The facilitator has flagged this as a key remaining gap. It will be addressed in Stage 4.",
+      "Good point — the ministry will need to respond to this specifically in their public record."
+    ];
+    const r = document.createElement('div'); r.className='sb-d-msg bot';
+    r.innerHTML=`<div class="sb-d-author">🏛 Facilitator (g0v)</div>${replies[Math.floor(Math.random()*replies.length)]}`;
+    feed.appendChild(r);
+    feed.scrollTop = feed.scrollHeight;
+  }, 900);
+}
+
+function sbGenerateBrief() {
+  const title = document.getElementById('sb-title').value.trim() || 'Policy Issue';
+  const problem = document.getElementById('sb-problem').value.trim();
+  const stkA = document.getElementById('sb-stk-a').value.trim() || 'Stakeholder Group A';
+  const stkApos = document.getElementById('sb-stk-a-pos').value.trim();
+  const stkB = document.getElementById('sb-stk-b').value.trim() || 'Stakeholder Group B';
+  const stkBpos = document.getElementById('sb-stk-b-pos').value.trim();
+  const agreed = sbStatements.filter((_,i)=>sbVotes[i]._type==='agree');
+  const disputed = sbStatements.filter((_,i)=>sbVotes[i]._type==='disagree');
+  const today = new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('sb-brief').innerHTML = `
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+      <div style="background:var(--blue-light); border-radius:8px; padding:8px 12px; font-size:20px;">📄</div>
+      <div><h3>${title}</h3><div class="pb-meta">vTaiwan Policy Brief · Generated ${today}</div></div>
+    </div>
+    <div class="pb-section"><h4>Problem Statement</h4><p>${problem || 'No problem statement provided.'}</p></div>
+    <div class="pb-section"><h4>Stakeholders</h4>
+      <p><strong>${stkA}:</strong> ${stkApos || 'Position not specified.'}<br>
+      <strong>${stkB}:</strong> ${stkBpos || 'Position not specified.'}</p>
+    </div>
+    ${agreed.length > 0 ? `<div class="pb-section"><h4>Pol.is Consensus Points (${agreed.length})</h4>
+      ${agreed.map(s=>`<div class="pb-consensus-item">${s}</div>`).join('')}
+    </div>` : ''}
+    ${disputed.length > 0 ? `<div class="pb-section"><h4>Remaining Disputes (${disputed.length})</h4>
+      ${disputed.map(s=>`<div style="font-size:12px; color:var(--text-sec); padding:3px 0; border-bottom:1px solid var(--bg-ter); display:flex; gap:8px;"><span style="color:#dc2626;">✗</span>${s}</div>`).join('')}
+    </div>` : ''}
+    ${sbDebatePoints.length > 0 ? `<div class="pb-section"><h4>Key Points Raised in Debate</h4>
+      ${sbDebatePoints.map(p=>`<div style="font-size:12px; color:var(--text-sec); padding:3px 0; display:flex; gap:8px; border-bottom:1px solid var(--bg-ter);"><span>→</span>${p}</div>`).join('')}
+    </div>` : ''}
+    <div class="pb-action">
+      ${agreed.length > 0
+        ? `📋 Recommended action: Submit the ${agreed.length} consensus point(s) to the relevant ministry as a rough consensus. Government must respond point-by-point within 30 days.`
+        : `⚠️ No consensus points identified yet. Further Pol.is polling rounds are recommended before the reflection stage.`}
+    </div>`;
+}
+
+/* ═══ CASES ═══ */
+function showCase(id, btn) {
+  document.querySelectorAll('.case-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.case-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('case-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ═══ INIT ═══ */
+renderTimeline('all');
+</script>
+</body>
+</html>

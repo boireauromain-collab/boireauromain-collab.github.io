@@ -48,6 +48,13 @@ jobs:
       run: |
         jupyter-book build .
 
+    # Copy standalone website(s) into the published site
+    - name: Bundle standalone sites
+      run: |
+        if [ -d vtaiwan ]; then
+          cp -r vtaiwan _build/html/vtaiwan
+        fi
+
     # Upload the book's HTML as an artifact
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3

@@ -9,6 +9,7 @@ exclude_patterns:
   - .github/*
   - .pytest_cache/*
   - .venv/*
+  - vtaiwan/*
 
 execute:
   execute_notebooks: "off"
